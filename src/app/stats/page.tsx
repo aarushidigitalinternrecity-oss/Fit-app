@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useWorkoutData } from '@/hooks/use-workout-data';
@@ -17,6 +18,10 @@ const MuscleHeatmap = dynamic(() => import('@/components/dashboard/MuscleHeatmap
   loading: () => <Skeleton className="h-[300px] w-full" />,
   ssr: false
 });
+const CalorieBurnStats = dynamic(() => import('@/components/dashboard/CalorieBurnStats'), {
+    loading: () => <Skeleton className="h-[300px] w-full" />,
+    ssr: false
+});
 
 export default function StatsPage() {
   const { data } = useWorkoutData();
@@ -25,6 +30,7 @@ export default function StatsPage() {
     <AppLayout>
       <div className="grid grid-cols-1 gap-4 md:gap-6">
         <QuickStats workouts={data?.workouts} />
+        <CalorieBurnStats workouts={data?.workouts} />
         <TrendSnapshotChart workouts={data?.workouts} customExercises={data?.customExercises} />
         <MuscleHeatmap />
       </div>

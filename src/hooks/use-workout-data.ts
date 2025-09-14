@@ -60,6 +60,7 @@ export function useWorkoutData() {
     // Check for new Personal Records
     const currentPRs = calculatePersonalRecords(data.workouts);
     workoutWithId.exercises.forEach(exercise => {
+      if (!Array.isArray(exercise.sets)) return;
       exercise.sets.forEach(set => {
         if (!set.completed) return;
         const existingPR = currentPRs.find(pr => pr.exerciseName === exercise.name);
@@ -144,6 +145,23 @@ export function useWorkoutData() {
 
   return { data, loading, addWorkout, addCustomExercise, editCustomExercise, deleteCustomExercise, addPersonalGoal, editPersonalGoal, deletePersonalGoal };
 }
+
+
+/**
+ * Calculates the total volume for a single workout.
+ * @param workout A workout object.
+ * @returns The total volume (sum of weight * reps for all sets).
+ */
+export const calculateWorkoutVolume = (workout: Workout): number => {
+    if (!workout || !Array.isArray(workout.exercises)) return 0;
+    
+    return workout.exercises.reduce((totalVolume, exercise) => {
+        if (!Array.isArray(exercise.sets)) return totalVolume;
+        const exerciseVolume = exercise.sets.reduce((vol, set) => vol + (set.weight * set.reps), 0);
+        return totalVolume + exerciseVolume;
+    }, 0);
+};
+
 
 /**
  * Calculates personal records from a list of workouts.

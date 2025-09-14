@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { BarChart3, Repeat, Weight, Dumbbell } from "lucide-react";
 import type { Workout } from "@/lib/types";
 import { useMemo } from "react";
+import { calculateWorkoutVolume } from "@/hooks/use-workout-data";
 
 interface StatProps {
     icon: React.ReactNode;
@@ -29,13 +30,12 @@ const getStats = (workouts: Workout[] | undefined) => {
     
     const totalWorkouts = workouts.length;
     
-    const totalVolume = workouts.reduce((total, w) => 
-        total + w.exercises.reduce((sub, ex) => 
-            sub + (Array.isArray(ex.sets) ? ex.sets.reduce((setTotal, set) => setTotal + (set.reps * (set.weight || 0)), 0) : 0)
-        , 0), 0);
+    const totalVolume = workouts.reduce((total, w) => total + calculateWorkoutVolume(w), 0);
     
     const exerciseCounts = workouts.flatMap(w => w.exercises).reduce((acc, ex) => {
-        acc[ex.name] = (acc[ex.name] || 0) + 1;
+        if (ex && ex.name) {
+          acc[ex.name] = (acc[ex.name] || 0) + 1;
+        }
         return acc;
     }, {} as Record<string, number>);
 

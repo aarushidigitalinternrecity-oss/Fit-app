@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -8,10 +9,10 @@ import { Input } from '@/components/ui/input';
 import { SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Plus, Trash2 } from 'lucide-react';
-import type { Workout, CustomExercise } from '@/lib/types';
+import type { Workout, CustomExercise, Exercise } from '@/lib/types';
 import { PRELOADED_EXERCISES } from '@/lib/mock-data';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 
 const exerciseSchema = z.object({
@@ -25,15 +26,16 @@ const workoutSchema = z.object({
   exercises: z.array(exerciseSchema).min(1, "Add at least one exercise."),
 });
 
-type WorkoutFormData = z.infer<typeof workoutSchema>;
+export type WorkoutFormData = z.infer<typeof workoutSchema>;
 
 interface WorkoutLoggerProps {
   addWorkout: (workout: Omit<Workout, 'id'>) => void;
   customExercises: CustomExercise[] | undefined;
   onSheetClose: () => void;
+  suggestedWorkout?: Omit<WorkoutFormData, 'id'>;
 }
 
-export default function WorkoutLogger({ addWorkout, customExercises, onSheetClose }: WorkoutLoggerProps) {
+export default function WorkoutLogger({ addWorkout, customExercises, onSheetClose, suggestedWorkout }: WorkoutLoggerProps) {
   const form = useForm<WorkoutFormData>({
     resolver: zodResolver(workoutSchema),
     defaultValues: {
@@ -41,10 +43,20 @@ export default function WorkoutLogger({ addWorkout, customExercises, onSheetClos
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "exercises",
   });
+
+  useEffect(() => {
+    if (suggestedWorkout) {
+        // We need to type cast here because of RHF's strict typing on `replace`.
+        const suggestedExercisesForRHF = suggestedWorkout.exercises as (Exercise & { id?: string })[];
+        replace(suggestedExercisesForRHF);
+    }
+  // We only want this to run when the suggestedWorkout prop changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestedWorkout, replace]);
 
   const availableExercises = useMemo(() => {
     const custom = customExercises?.map(e => ({ ...e, isCustom: true })) ?? [];
@@ -70,20 +82,24 @@ export default function WorkoutLogger({ addWorkout, customExercises, onSheetClos
     onSheetClose();
   };
 
+  // Generate unique default values for the accordion based on field IDs
+  const accordionDefaultValues = useMemo(() => fields.map(field => `item-${field.id}`), [fields]);
+
+
   return (
     <SheetContent className="w-full h-full flex flex-col p-4 sm:p-6 sm:max-w-lg">
       <SheetHeader>
-        <SheetTitle>Log New Workout</SheetTitle>
+        <SheetTitle>{suggestedWorkout ? 'Log Suggested Workout' : 'Log New Workout'}</SheetTitle>
         <SheetDescription>
-          Add your exercises for today's session.
+          {suggestedWorkout ? 'Adjust and confirm the details for your session.' : 'Add your exercises for today\'s session.'}
         </SheetDescription>
       </SheetHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col flex-grow overflow-hidden">
           <div className="flex-grow overflow-y-auto pr-2 -mr-2">
-            <Accordion type="multiple" defaultValue={['item-0']} className="w-full space-y-4">
+            <Accordion type="multiple" defaultValue={accordionDefaultValues} className="w-full space-y-4">
                 {fields.map((field, index) => (
-                <AccordionItem value={`item-${index}`} key={field.id} className="border-border border rounded-lg bg-card">
+                <AccordionItem value={`item-${field.id}`} key={field.id} className="border-border border rounded-lg bg-card">
                     <AccordionTrigger className="p-4 hover:no-underline">
                         <div className="flex justify-between items-center w-full">
                             <span className="font-semibold truncate pr-2">

@@ -1,15 +1,17 @@
 "use client";
 
-import { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
+import { SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter, SheetClose } from '@/components/ui/sheet';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle, Trash2 } from 'lucide-react';
-import type { Workout } from '@/lib/types';
+import type { Workout, CustomExercise } from '@/lib/types';
+import { PRELOADED_EXERCISES } from '@/lib/mock-data';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { useMemo } from 'react';
 
 const exerciseSchema = z.object({
   name: z.string().min(1, "Exercise name is required."),
@@ -26,9 +28,11 @@ type WorkoutFormData = z.infer<typeof workoutSchema>;
 
 interface WorkoutLoggerProps {
   addWorkout: (workout: Omit<Workout, 'id'>) => void;
+  customExercises: CustomExercise[] | undefined;
+  onSheetClose: () => void;
 }
 
-export default function WorkoutLogger({ addWorkout }: WorkoutLoggerProps) {
+export default function WorkoutLogger({ addWorkout, customExercises, onSheetClose }: WorkoutLoggerProps) {
   const form = useForm<WorkoutFormData>({
     resolver: zodResolver(workoutSchema),
     defaultValues: {
@@ -41,6 +45,20 @@ export default function WorkoutLogger({ addWorkout }: WorkoutLoggerProps) {
     name: "exercises",
   });
 
+  const availableExercises = useMemo(() => {
+    const custom = customExercises?.map(e => ({ ...e, isCustom: true })) ?? [];
+    const preloaded = PRELOADED_EXERCISES.map(e => ({ name: e, isCustom: false}));
+    const all = [...custom, ...preloaded];
+    
+    // Deduplicate
+    const uniqueNames = new Set<string>();
+    return all.filter(ex => {
+        if(uniqueNames.has(ex.name)) return false;
+        uniqueNames.add(ex.name);
+        return true;
+    }).sort((a,b) => a.name.localeCompare(b.name));
+  }, [customExercises]);
+
   const onSubmit = (data: WorkoutFormData) => {
     const newWorkout = {
       date: new Date().toISOString(),
@@ -48,6 +66,7 @@ export default function WorkoutLogger({ addWorkout }: WorkoutLoggerProps) {
     };
     addWorkout(newWorkout);
     form.reset({ exercises: [{ name: '', sets: 1, reps: 1, weight: 0 }]});
+    onSheetClose();
   };
 
   return (
@@ -70,9 +89,21 @@ export default function WorkoutLogger({ addWorkout }: WorkoutLoggerProps) {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Exercise Name</FormLabel>
-                          <FormControl>
-                            <Input placeholder="e.g., Bench Press" {...field} />
-                          </FormControl>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select an exercise" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {availableExercises.map(ex => (
+                                <SelectItem key={ex.name} value={ex.name}>
+                                  {ex.isCustom && "⭐ "}
+                                  {ex.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -132,7 +163,7 @@ export default function WorkoutLogger({ addWorkout }: WorkoutLoggerProps) {
             ))}
           </div>
 
-          <div className="flex-shrink-0 space-y-4">
+          <div className="flex-shrink-0 space-y-4 pt-4 border-t">
             <Button
               type="button"
               variant="outline"
@@ -144,7 +175,7 @@ export default function WorkoutLogger({ addWorkout }: WorkoutLoggerProps) {
             </Button>
 
             <SheetFooter>
-              <Button type="submit" className="w-full">Save Workout</Button>
+                <Button type="submit" className="w-full">Save Workout</Button>
             </SheetFooter>
           </div>
         </form>

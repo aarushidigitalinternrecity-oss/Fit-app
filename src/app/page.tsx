@@ -3,12 +3,14 @@
 import { useWorkoutData } from '@/hooks/use-workout-data';
 import { VibeFitLogo } from '@/components/VibeFitLogo';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Dumbbell, Plus } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import dynamic from 'next/dynamic';
 import { Sheet, SheetTrigger } from '@/components/ui/sheet';
 import WorkoutLogger from '@/components/workout/WorkoutLogger';
+import { useState } from 'react';
+import ManageExercises from '@/components/workout/ManageExercises';
 
 const TodaySummary = dynamic(() => import('@/components/dashboard/TodaySummary'), { 
   loading: () => <Skeleton className="h-[260px] w-full" />,
@@ -49,20 +51,42 @@ const WorkoutMotivation = dynamic(() => import('@/components/dashboard/WorkoutMo
 
 
 export default function Home() {
-  const { data, addWorkout } = useWorkoutData();
+  const { data, addWorkout, addCustomExercise, editCustomExercise, deleteCustomExercise } = useWorkoutData();
+  const [isWorkoutLoggerOpen, setIsWorkoutLoggerOpen] = useState(false);
+  const [isManageExercisesOpen, setIsManageExercisesOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background text-foreground p-4 sm:p-6 lg:p-8">
       <header className="flex justify-between items-center mb-8">
         <VibeFitLogo />
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" /> Add Workout
-            </Button>
-          </SheetTrigger>
-          <WorkoutLogger addWorkout={addWorkout} />
-        </Sheet>
+        <div className='flex gap-2'>
+            <Sheet open={isManageExercisesOpen} onOpenChange={setIsManageExercisesOpen}>
+                <SheetTrigger asChild>
+                    <Button variant="outline">
+                        <Dumbbell className="mr-2 h-4 w-4" /> Manage Exercises
+                    </Button>
+                </SheetTrigger>
+                <ManageExercises 
+                    customExercises={data?.customExercises || []}
+                    addCustomExercise={addCustomExercise}
+                    editCustomExercise={editCustomExercise}
+                    deleteCustomExercise={deleteCustomExercise}
+                    onSheetClose={() => setIsManageExercisesOpen(false)}
+                />
+            </Sheet>
+            <Sheet open={isWorkoutLoggerOpen} onOpenChange={setIsWorkoutLoggerOpen}>
+                <SheetTrigger asChild>
+                    <Button>
+                    <Plus className="mr-2 h-4 w-4" /> Add Workout
+                    </Button>
+                </SheetTrigger>
+                <WorkoutLogger 
+                    addWorkout={addWorkout} 
+                    customExercises={data?.customExercises}
+                    onSheetClose={() => setIsWorkoutLoggerOpen(false)}
+                />
+            </Sheet>
+        </div>
       </header>
 
       <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -91,7 +115,7 @@ export default function Home() {
         </div>
         
         <div className="lg:col-span-2">
-            <TrendSnapshotChart workouts={data?.workouts} />
+            <TrendSnapshotChart workouts={data?.workouts} customExercises={data?.customExercises} />
         </div>
         
         <div className="lg:col-span-4">

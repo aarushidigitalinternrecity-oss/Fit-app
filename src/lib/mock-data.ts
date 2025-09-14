@@ -3,6 +3,20 @@ import { subDays } from 'date-fns';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+export const PRELOADED_EXERCISES = [
+  'Bench Press',
+  'Incline Dumbbell Press',
+  'Tricep Pushdown',
+  'Squat',
+  'Leg Press',
+  'Leg Curl',
+  'Deadlift',
+  'Pull Ups',
+  'Barbell Row',
+  'Overhead Press',
+  'Lateral Raises',
+];
+
 export const MOCK_DATA: AppData = {
   workouts: [
     {
@@ -55,4 +69,8 @@ export const MOCK_DATA: AppData = {
       weeklyWorkoutTarget: 4,
     },
   },
+  customExercises: [
+    { id: generateId(), name: 'Cable Crossover', muscleGroup: 'Chest' },
+    { id: generateId(), name: 'Hammer Curls', muscleGroup: 'Arms' },
+  ],
 };

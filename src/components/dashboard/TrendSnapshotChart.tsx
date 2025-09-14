@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Workout } from "@/lib/types";
+import type { Workout, CustomExercise } from "@/lib/types";
 import { format } from 'date-fns';
 import { AreaChart } from 'lucide-react';
 
@@ -22,16 +22,23 @@ const getProgressionData = (workouts: Workout[] | undefined, exerciseName: strin
         .sort((a,b) => a.fullDate.getTime() - b.fullDate.getTime());
 };
 
-const getUniqueExercises = (workouts: Workout[] | undefined) => {
+const getUniqueExercises = (workouts: Workout[] | undefined, customExercises: CustomExercise[] | undefined) => {
     if (!workouts) return [];
     const exerciseSet = new Set<string>();
     workouts.forEach(w => w.exercises.forEach(ex => ex.weight > 0 && exerciseSet.add(ex.name)));
-    return Array.from(exerciseSet);
+    customExercises?.forEach(ex => exerciseSet.add(ex.name));
+    return Array.from(exerciseSet).sort();
 };
 
-export default function TrendSnapshotChart({ workouts }: { workouts: Workout[] | undefined }) {
-  const uniqueExercises = useMemo(() => getUniqueExercises(workouts), [workouts]);
-  const [selectedExercise, setSelectedExercise] = useState<string | null>(uniqueExercises[0] || null);
+export default function TrendSnapshotChart({ workouts, customExercises }: { workouts: Workout[] | undefined, customExercises: CustomExercise[] | undefined }) {
+  const uniqueExercises = useMemo(() => getUniqueExercises(workouts, customExercises), [workouts, customExercises]);
+  const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedExercise && uniqueExercises.length > 0) {
+      setSelectedExercise(uniqueExercises[0]);
+    }
+  }, [uniqueExercises, selectedExercise]);
 
   const data = useMemo(() => getProgressionData(workouts, selectedExercise), [workouts, selectedExercise]);
 
@@ -46,7 +53,7 @@ export default function TrendSnapshotChart({ workouts }: { workouts: Workout[] |
                 </CardTitle>
                 <CardDescription>Progression for a key lift.</CardDescription>
             </div>
-            <Select onValueChange={setSelectedExercise} defaultValue={selectedExercise || undefined}>
+            <Select onValueChange={setSelectedExercise} value={selectedExercise || ''} >
                 <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select exercise" />
                 </SelectTrigger>

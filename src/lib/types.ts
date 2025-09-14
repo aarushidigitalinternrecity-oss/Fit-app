@@ -18,6 +18,12 @@ export type PersonalRecord = {
   date: string; // ISO string
 };
 
+export type CustomExercise = {
+  id: string;
+  name: string;
+  muscleGroup: string;
+}
+
 export type AppData = {
   workouts: Workout[];
   user: {
@@ -25,5 +31,6 @@ export type AppData = {
     goals: {
       weeklyWorkoutTarget: number;
     };
-  }
+  },
+  customExercises: CustomExercise[];
 };

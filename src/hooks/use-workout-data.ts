@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { MOCK_DATA } from '@/lib/mock-data';
-import type { AppData, Workout, PersonalRecord } from '@/lib/types';
+import type { AppData, Workout, PersonalRecord, CustomExercise } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 
 const DATA_KEY = 'vibefit_data';
@@ -16,7 +16,12 @@ export function useWorkoutData() {
     try {
       const storedData = localStorage.getItem(DATA_KEY);
       if (storedData) {
-        setData(JSON.parse(storedData));
+        const parsedData = JSON.parse(storedData);
+        // Ensure customExercises is an array
+        if (!Array.isArray(parsedData.customExercises)) {
+            parsedData.customExercises = [];
+        }
+        setData(parsedData);
       } else {
         localStorage.setItem(DATA_KEY, JSON.stringify(MOCK_DATA));
         setData(MOCK_DATA);
@@ -62,12 +67,45 @@ export function useWorkoutData() {
     saveData(newData);
   }, [data, saveData, toast]);
 
-  return { data, loading, addWorkout };
+  const addCustomExercise = useCallback((exercise: Omit<CustomExercise, 'id'>) => {
+    if (!data) return;
+    const newExercise = { ...exercise, id: crypto.randomUUID() };
+    const newData: AppData = {
+      ...data,
+      customExercises: [...(data.customExercises || []), newExercise],
+    };
+    saveData(newData);
+    toast({ title: "✅ Exercise added!", description: `"${newExercise.name}" has been added to your library.` });
+  }, [data, saveData, toast]);
+
+  const editCustomExercise = useCallback((exerciseToUpdate: CustomExercise) => {
+    if (!data) return;
+    const updatedExercises = (data.customExercises || []).map(ex => 
+        ex.id === exerciseToUpdate.id ? exerciseToUpdate : ex
+    );
+    const newData: AppData = { ...data, customExercises: updatedExercises };
+    saveData(newData);
+    toast({ title: "✅ Exercise updated!", description: `"${exerciseToUpdate.name}" has been updated.` });
+  }, [data, saveData, toast]);
+
+  const deleteCustomExercise = useCallback((exerciseId: string) => {
+    if (!data) return;
+    const exerciseToDelete = (data.customExercises || []).find(ex => ex.id === exerciseId);
+    if (!exerciseToDelete) return;
+    const updatedExercises = (data.customExercises || []).filter(ex => ex.id !== exerciseId);
+    const newData: AppData = { ...data, customExercises: updatedExercises };
+    saveData(newData);
+    toast({ title: "🗑️ Exercise deleted", description: `"${exerciseToDelete.name}" has been removed.` });
+  }, [data, saveData, toast]);
+
+  return { data, loading, addWorkout, addCustomExercise, editCustomExercise, deleteCustomExercise };
 }
 
 export const calculatePersonalRecords = (workouts: Workout[]): PersonalRecord[] => {
     const prs: { [key: string]: PersonalRecord } = {};
     
+    if (!workouts) return [];
+
     const sortedWorkouts = [...workouts].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     sortedWorkouts.forEach(workout => {

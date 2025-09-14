@@ -22,7 +22,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 const exerciseSchema = z.object({
   name: z.string(),
   sets: z.coerce.number(),
-  reps: z.coerce.number(),
+  reps: z.coerce.number().min(0, "Reps can't be negative.").optional().default(0),
   weight: z.coerce.number().min(0, "Weight can't be negative.").optional().default(0),
   completed: z.boolean().default(false),
 });
@@ -71,7 +71,7 @@ export default function AdminFavouritePage() {
                 id: crypto.randomUUID(),
                 name: ex.name,
                 sets: ex.sets,
-                reps: ex.reps,
+                reps: ex.reps || 0,
                 weight: ex.weight || 0,
             }));
 
@@ -85,8 +85,10 @@ export default function AdminFavouritePage() {
     };
     
     const workoutProgress = useMemo(() => {
-        const completedCount = form.watch('exercises').filter(ex => ex.completed).length;
-        const totalCount = form.watch('exercises').length;
+        const watchedExercises = form.watch('exercises');
+        if (!watchedExercises) return 0;
+        const completedCount = watchedExercises.filter(ex => ex.completed).length;
+        const totalCount = watchedExercises.length;
         return totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
     }, [form]);
 
@@ -194,4 +196,3 @@ export default function AdminFavouritePage() {
         </AppLayout>
     );
 }
-

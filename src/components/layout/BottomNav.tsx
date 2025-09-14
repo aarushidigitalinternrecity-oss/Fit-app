@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, BarChart2, BookOpen, Plus } from 'lucide-react';
+import { Home, BarChart2, BookOpen, Plus, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,7 @@ import { useState } from 'react';
 
 const navItems = [
   { href: '/', label: 'Home', icon: Home },
+  { href: '/suggestions', label: 'Suggest', icon: Sparkles },
   { href: '/stats', label: 'Stats', icon: BarChart2 },
   { href: '/library', label: 'Library', icon: BookOpen },
 ];

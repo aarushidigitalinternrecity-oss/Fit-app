@@ -1,6 +1,6 @@
 "use client";
 
-import { VibeFitLogo } from '@/components/VibeFitLogo';
+import { TurboGrannyLogo } from '@/components/VibeFitLogo';
 import { Button } from '@/components/ui/button';
 import { Plus, BookOpen } from 'lucide-react';
 import { Sheet, SheetTrigger } from '@/components/ui/sheet';
@@ -22,7 +22,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </div>
       <div className="p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
         <header className="flex justify-between items-center mb-6 md:mb-8">
-          <VibeFitLogo />
+          <TurboGrannyLogo />
           <div className='hidden md:flex gap-2'>
             <Button variant="outline" asChild>
                 <Link href="/library">

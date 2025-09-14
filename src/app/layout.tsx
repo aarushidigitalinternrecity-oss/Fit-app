@@ -7,8 +7,8 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 
 export const metadata: Metadata = {
-  title: 'VibeFit',
-  description: 'Track your fitness journey and vibe with your progress.',
+  title: 'Turbo Granny',
+  description: 'The ultimate fitness tracker for the unstoppable granny.',
 };
 
 export default function RootLayout({

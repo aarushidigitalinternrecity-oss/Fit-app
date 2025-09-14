@@ -50,16 +50,16 @@ export default function TrendSnapshotChart({ workouts, customExercises }: { work
   return (
     <Card>
       <CardHeader>
-        <div className='flex justify-between items-start'>
+        <div className='flex flex-col md:flex-row justify-between items-start md:items-center gap-4'>
             <div>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
                     <AreaChart className="text-primary"/>
                     Trend Snapshot
                 </CardTitle>
                 <CardDescription>Progression for a key lift.</CardDescription>
             </div>
             <Select onValueChange={setSelectedExercise} value={selectedExercise || ''} disabled={uniqueExercises.length === 0} >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-full md:w-[200px]">
                     <SelectValue placeholder="Select exercise" />
                 </SelectTrigger>
                 <SelectContent>
@@ -70,7 +70,7 @@ export default function TrendSnapshotChart({ workouts, customExercises }: { work
             </Select>
         </div>
       </CardHeader>
-      <CardContent className="h-[200px]">
+      <CardContent className="h-[200px] md:h-[250px]">
         {data.length > 1 ? (
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>

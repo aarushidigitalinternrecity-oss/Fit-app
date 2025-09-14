@@ -14,8 +14,8 @@ const StatItem = ({ icon, label, value }: StatProps) => (
             {icon}
         </div>
         <div>
-            <p className="text-muted-foreground">{label}</p>
-            <p className="text-xl font-bold">{value}</p>
+            <p className="text-muted-foreground text-sm">{label}</p>
+            <p className="text-lg md:text-xl font-bold">{value}</p>
         </div>
     </div>
 );
@@ -45,7 +45,7 @@ export default function QuickStats({ workouts }: { workouts: Workout[] | undefin
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
                     <BarChart3 className="text-primary"/>
                     Quick Stats
                 </CardTitle>

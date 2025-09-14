@@ -46,7 +46,7 @@ export default function WorkoutMotivation({ workouts }: { workouts: Workout[] | 
   return (
     <Card className="h-full flex flex-col">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
           <Bot className="text-primary" />
           Personal Coach
         </CardTitle>

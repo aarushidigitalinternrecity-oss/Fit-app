@@ -21,7 +21,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 
 const MUSCLE_GROUPS = ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core", "Other"];
@@ -38,10 +39,11 @@ interface ManageExercisesProps {
   addCustomExercise: (exercise: Omit<CustomExercise, 'id'>) => void;
   editCustomExercise: (exercise: CustomExercise) => void;
   deleteCustomExercise: (id: string) => void;
-  onSheetClose: () => void;
+  onSheetClose?: () => void;
+  isSheet?: boolean;
 }
 
-export default function ManageExercises({ customExercises, addCustomExercise, editCustomExercise, deleteCustomExercise, onSheetClose }: ManageExercisesProps) {
+function ManageExercisesContent({ customExercises, addCustomExercise, editCustomExercise, deleteCustomExercise }: Omit<ManageExercisesProps, 'onSheetClose' | 'isSheet'>) {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const form = useForm<ExerciseFormData>({
@@ -72,17 +74,9 @@ export default function ManageExercises({ customExercises, addCustomExercise, ed
   }
 
   return (
-    <SheetContent className="sm:max-w-lg w-full overflow-y-auto">
-      <SheetHeader>
-        <SheetTitle>Manage Custom Exercises</SheetTitle>
-        <SheetDescription>
-          Add, edit, or delete your custom exercises.
-        </SheetDescription>
-      </SheetHeader>
-      
-      {/* Add/Edit Form */}
+    <div className="space-y-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(editingId ? onEditSubmit : onAddSubmit)} className="space-y-4 mt-6 p-4 border rounded-lg bg-background">
+        <form onSubmit={form.handleSubmit(editingId ? onEditSubmit : onAddSubmit)} className="space-y-4 p-4 border rounded-lg bg-card">
           <h3 className="font-semibold text-lg">{editingId ? 'Edit Exercise' : 'Add New Exercise'}</h3>
           <FormField
             control={form.control}
@@ -103,7 +97,7 @@ export default function ManageExercises({ customExercises, addCustomExercise, ed
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Muscle Group</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a muscle group" />
@@ -128,49 +122,79 @@ export default function ManageExercises({ customExercises, addCustomExercise, ed
         </form>
       </Form>
 
-      {/* Custom Exercises List */}
-      <div className="mt-6 space-y-2">
-        <h3 className="font-semibold text-lg px-1">Your Exercises</h3>
-        {customExercises.length > 0 ? (
-          <ul className='space-y-2'>
-            {customExercises.map(ex => (
-              <li key={ex.id} className='flex items-center justify-between p-3 rounded-lg bg-card-foreground/5'>
-                <div>
-                  <p className="font-medium">{ex.name}</p>
-                  <p className="text-sm text-muted-foreground">{ex.muscleGroup}</p>
-                </div>
-                <div className='flex gap-1'>
-                  <Button variant="ghost" size="icon" onClick={() => startEditing(ex)}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon" className='text-destructive hover:text-destructive'>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will permanently delete the exercise "{ex.name}". This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => deleteCustomExercise(ex.id)}>Delete</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className='text-muted-foreground text-center p-4'>You haven't added any custom exercises yet.</p>
-        )}
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Your Exercises</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {customExercises.length > 0 ? (
+            <ul className='space-y-2'>
+              {customExercises.map(ex => (
+                <li key={ex.id} className='flex items-center justify-between p-3 rounded-lg bg-card-foreground/5'>
+                  <div>
+                    <p className="font-medium">{ex.name}</p>
+                    <p className="text-sm text-muted-foreground">{ex.muscleGroup}</p>
+                  </div>
+                  <div className='flex gap-1'>
+                    <Button variant="ghost" size="icon" onClick={() => startEditing(ex)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className='text-destructive hover:text-destructive'>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will permanently delete the exercise "{ex.name}". This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => deleteCustomExercise(ex.id)}>Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className='text-muted-foreground text-center p-4'>You haven't added any custom exercises yet.</p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
 
-    </SheetContent>
-  );
+export default function ManageExercises({ customExercises, addCustomExercise, editCustomExercise, deleteCustomExercise, isSheet = true }: ManageExercisesProps) {
+
+  const commonProps = {
+    customExercises,
+    addCustomExercise,
+    editCustomExercise,
+    deleteCustomExercise
+  };
+
+  if (isSheet) {
+    return (
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Manage Custom Exercises</SheetTitle>
+          <SheetDescription>
+            Add, edit, or delete your custom exercises.
+          </SheetDescription>
+        </SheetHeader>
+        <div className="mt-6">
+          <ManageExercisesContent {...commonProps} />
+        </div>
+      </SheetContent>
+    );
+  }
+
+  return <ManageExercisesContent {...commonProps} />;
 }

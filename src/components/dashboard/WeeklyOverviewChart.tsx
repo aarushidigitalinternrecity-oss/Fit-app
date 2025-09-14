@@ -41,7 +41,7 @@ export default function WeeklyOverviewChart({ workouts }: { workouts: Workout[] 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
             <TrendingUp className="text-primary"/>
             Weekly Overview
         </CardTitle>
@@ -49,7 +49,7 @@ export default function WeeklyOverviewChart({ workouts }: { workouts: Workout[] 
           Your workout activity for the last 7 days. Total Volume: {totalVolume.toLocaleString()} kg
         </CardDescription>
       </CardHeader>
-      <CardContent className="h-[250px]">
+      <CardContent className="h-[250px] md:h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />

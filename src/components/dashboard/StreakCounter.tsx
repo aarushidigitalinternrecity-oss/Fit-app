@@ -40,16 +40,16 @@ export default function StreakCounter({ workouts }: { workouts: Workout[] | unde
   const streak = calculateStreak(workouts);
 
   return (
-    <Card className="flex flex-col items-center justify-center text-center h-full">
+    <Card className="flex flex-col items-center justify-center text-center h-full p-4">
       <CardHeader className="pb-2">
-        <CardTitle>Workout Streak</CardTitle>
+        <CardTitle className="text-base md:text-lg">Workout Streak</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-2">
         <div className="flex items-center justify-center gap-2">
-          <span className="text-6xl font-bold text-primary">{streak}</span>
-          <Flame className="size-12 text-orange-500" />
+          <span className="text-5xl sm:text-6xl font-bold text-primary">{streak}</span>
+          <Flame className="size-10 sm:size-12 text-orange-500" />
         </div>
-        <p className="text-muted-foreground mt-1">day streak</p>
+        <p className="text-muted-foreground mt-1 text-sm">day streak</p>
       </CardContent>
     </Card>
   );

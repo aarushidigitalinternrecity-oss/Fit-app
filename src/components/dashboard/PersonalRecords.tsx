@@ -17,7 +17,7 @@ export default function PersonalRecords({ workouts }: { workouts: Workout[] | un
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
           <Trophy className="text-yellow-500" />
           Personal Records
         </CardTitle>
@@ -32,7 +32,7 @@ export default function PersonalRecords({ workouts }: { workouts: Workout[] | un
                   <p className="font-semibold">{pr.exerciseName}</p>
                   <p className="text-sm text-muted-foreground">{formatDistanceToNow(new Date(pr.date), { addSuffix: true })}</p>
                 </div>
-                <p className="text-xl font-bold text-primary">{pr.weight} kg</p>
+                <p className="text-lg md:text-xl font-bold text-primary">{pr.weight} kg</p>
               </li>
             ))}
           </ul>

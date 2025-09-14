@@ -12,7 +12,7 @@ export default function TodaySummary({ workouts }: { workouts: Workout[] | undef
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
           <Activity className="text-primary" />
           Today's Summary
         </CardTitle>
@@ -22,7 +22,7 @@ export default function TodaySummary({ workouts }: { workouts: Workout[] | undef
       </CardHeader>
       <CardContent>
         {allExercises.length > 0 ? (
-          <ScrollArea className="h-[150px]">
+          <ScrollArea className="h-[150px] md:h-[180px]">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -45,7 +45,7 @@ export default function TodaySummary({ workouts }: { workouts: Workout[] | undef
             </Table>
           </ScrollArea>
         ) : (
-          <div className="flex h-[150px] flex-col items-center justify-center text-center text-muted-foreground p-8">
+          <div className="flex h-[150px] md:h-[180px] flex-col items-center justify-center text-center text-muted-foreground p-8">
             <p>Your logged exercises for today will appear here.</p>
           </div>
         )}

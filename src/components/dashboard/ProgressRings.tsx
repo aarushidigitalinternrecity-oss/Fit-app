@@ -19,8 +19,8 @@ const getWorkoutsThisWeek = (workouts: Workout[] | undefined) => {
     return uniqueDaysThisWeek.size;
 }
 
-const CircleProgress = ({ percentage, size = 100 }: { percentage: number, size?: number }) => {
-    const strokeWidth = 8;
+const CircleProgress = ({ percentage, size }: { percentage: number, size: number }) => {
+    const strokeWidth = 10;
     const radius = (size - strokeWidth) / 2;
     const circumference = radius * 2 * Math.PI;
     const [offset, setOffset] = useState(circumference);
@@ -70,15 +70,15 @@ export default function ProgressRings({ workouts, weeklyGoal }: { workouts: Work
   const percentage = Math.min((workoutsDone / goal) * 100, 100);
 
   return (
-    <Card className="flex flex-col items-center justify-center text-center h-full">
+    <Card className="flex flex-col items-center justify-center text-center h-full p-4">
       <CardHeader className="pb-2">
-        <CardTitle>Weekly Goal</CardTitle>
+        <CardTitle className="text-base md:text-lg">Weekly Goal</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="relative">
-            <CircleProgress percentage={percentage} />
+      <CardContent className="p-2 flex-grow flex items-center justify-center">
+        <div className="relative w-[120px] h-[120px] sm:w-[150px] sm:h-[150px]">
+            <CircleProgress percentage={percentage} size={150} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl font-bold">{workoutsDone}</span>
+                <span className="text-2xl sm:text-3xl font-bold">{workoutsDone}</span>
                 <span className="text-sm text-muted-foreground">/{goal}</span>
             </div>
         </div>

@@ -6,6 +6,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import dynamic from 'next/dynamic';
 import AppLayout from '@/components/layout/AppLayout';
 
+const StreakCounter = dynamic(() => import('@/components/dashboard/StreakCounter'), {
+    loading: () => <Skeleton className="h-[200px] w-full" />,
+    ssr: false
+});
+const ProgressRings = dynamic(() => import('@/components/dashboard/ProgressRings'), {
+    loading: () => <Skeleton className="h-[200px] w-full" />,
+    ssr: false
+});
 const TodaySummary = dynamic(() => import('@/components/dashboard/TodaySummary'), {
   loading: () => <Skeleton className="h-[250px] w-full" />,
   ssr: false
@@ -18,42 +26,25 @@ const WeeklyOverviewChart = dynamic(() => import('@/components/dashboard/WeeklyO
     loading: () => <Skeleton className="h-[350px] w-full" />,
     ssr: false
 });
-const ProgressRings = dynamic(() => import('@/components/dashboard/ProgressRings'), {
-    loading: () => <Skeleton className="h-[200px] w-full" />,
-    ssr: false
-});
-const StreakCounter = dynamic(() => import('@/components/dashboard/StreakCounter'), {
-    loading: () => <Skeleton className="h-[200px] w-full" />,
-    ssr: false
-});
-const WorkoutMotivation = dynamic(() => import('@/components/dashboard/WorkoutMotivation'), {
-    loading: () => <Skeleton className="h-[250px] w-full" />,
-    ssr: false
-});
 
 
 export default function DashboardPage() {
-  const { data, loading } = useWorkoutData();
+  const { data } = useWorkoutData();
 
   return (
     <AppLayout>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-        {/* Main column (stacks on mobile) */}
-        <div className="md:col-span-2 space-y-4 md:space-y-6">
-          <TodaySummary workouts={data?.workouts} />
-          <WeeklyOverviewChart workouts={data?.workouts} />
-          <PersonalRecords workouts={data?.workouts} />
+      <div className="flex flex-col items-center gap-4 md:gap-6">
+        <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+            <StreakCounter workouts={data?.workouts} />
+            <ProgressRings workouts={data?.workouts} weeklyGoal={data?.user.goals.weeklyWorkoutTarget} />
         </div>
-
-        {/* Right sidebar (stacks on mobile) */}
-        <div className="space-y-4 md:space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-6">
-                <StreakCounter workouts={data?.workouts} />
-                <ProgressRings workouts={data?.workouts} weeklyGoal={data?.user.goals.weeklyWorkoutTarget} />
-            </div>
-          <WorkoutMotivation workouts={data?.workouts} />
+        <div className="w-full max-w-md space-y-4 md:space-y-6">
+            <TodaySummary workouts={data?.workouts} />
+            <WeeklyOverviewChart workouts={data?.workouts} />
+            <PersonalRecords workouts={data?.workouts} />
         </div>
       </div>
     </AppLayout>
   );
 }
+

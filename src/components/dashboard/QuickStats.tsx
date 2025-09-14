@@ -31,7 +31,7 @@ const getStats = (workouts: Workout[] | undefined) => {
     
     const totalVolume = workouts.reduce((total, w) => 
         total + w.exercises.reduce((sub, ex) => 
-            sub + ex.sets.reduce((setTotal, set) => setTotal + (set.reps * (set.weight || 0)), 0)
+            sub + (Array.isArray(ex.sets) ? ex.sets.reduce((setTotal, set) => setTotal + (set.reps * (set.weight || 0)), 0) : 0)
         , 0), 0);
     
     const exerciseCounts = workouts.flatMap(w => w.exercises).reduce((acc, ex) => {

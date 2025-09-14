@@ -11,7 +11,7 @@ import { Bot, Dumbbell, Sparkles, Lightbulb, Clock, Zap, Plus } from 'lucide-rea
 import { PRELOADED_EXERCISES } from '@/lib/mock-data';
 import AppLayout from '@/components/layout/AppLayout';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import WorkoutLogger from '@/components/workout/WorkoutLogger';
+import WorkoutLogger, { WorkoutFormData } from '@/components/workout/WorkoutLogger';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 function formatWorkoutHistory(workouts: any[] | undefined): string {
@@ -19,9 +19,13 @@ function formatWorkoutHistory(workouts: any[] | undefined): string {
         return "No workouts recorded yet.";
     }
     const recentWorkouts = workouts.slice(0, 5);
-    return recentWorkouts.map(w =>
-        `On ${new Date(w.date).toLocaleDateString()}, user did: ${w.exercises.map((e: any) => `${e.name} (${e.sets}x${e.reps} at ${e.weight}kg)`).join(', ')}`
-    ).join('; ');
+    return recentWorkouts.map(w => {
+        const exercises = w.exercises.map((e: any) => {
+            const bestSet = e.sets.reduce((best: any, current: any) => current.weight > best.weight ? current : best, { weight: 0, reps: 0 });
+            return `${e.name} (heaviest set: ${bestSet.weight}kg for ${bestSet.reps} reps)`;
+        }).join(', ');
+        return `On ${new Date(w.date).toLocaleDateString()}, user did: ${exercises}`;
+    }).join('; ');
 }
 
 const workoutSplits = ["Full Body", "Upper Body", "Lower Body", "Push", "Pull", "Legs", "Chest", "Back", "Shoulders", "Arms"];
@@ -67,14 +71,18 @@ export default function SuggestionsPage() {
         }
     };
 
-    const suggestedWorkoutForLogger = useMemo(() => {
+    const suggestedWorkoutForLogger = useMemo((): WorkoutFormData | undefined => {
         if (!suggestion) return undefined;
         return {
             exercises: suggestion.suggestedExercises.map(ex => ({
+                id: crypto.randomUUID(),
                 name: ex.name,
-                sets: ex.sets,
-                reps: parseInt(String(ex.reps).split('-')[0], 10) || 10,
-                weight: parseFloat(String(ex.weight)) || 0,
+                sets: Array.from({length: ex.sets}, () => ({
+                    id: crypto.randomUUID(),
+                    reps: parseInt(String(ex.reps).split('-')[0], 10) || 10,
+                    weight: parseFloat(String(ex.weight)) || 0,
+                    completed: false,
+                })),
             }))
         }
     }, [suggestion]);
@@ -221,4 +229,3 @@ function SuggestionSkeleton() {
         </Card>
     );
 }
-

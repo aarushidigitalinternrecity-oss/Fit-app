@@ -1,3 +1,4 @@
+
 import type { AppData } from '@/lib/types';
 import { subDays, addMonths } from 'date-fns';
 
@@ -23,50 +24,112 @@ export const MOCK_DATA: AppData = {
       id: generateId(),
       date: subDays(new Date(), 1).toISOString(),
       exercises: [
-        { id: generateId(), name: 'Bench Press', sets: 4, reps: 8, weight: 100 },
-        { id: generateId(), name: 'Incline Dumbbell Press', sets: 3, reps: 10, weight: 30 },
-        { id: generateId(), name: 'Tricep Pushdown', sets: 3, reps: 12, weight: 25 },
+        { id: generateId(), name: 'Bench Press', sets: [
+            { id: generateId(), weight: 100, reps: 8, completed: true },
+            { id: generateId(), weight: 100, reps: 8, completed: true },
+            { id: generateId(), weight: 100, reps: 7, completed: true },
+            { id: generateId(), weight: 100, reps: 6, completed: true },
+        ]},
+        { id: generateId(), name: 'Incline Dumbbell Press', sets: [
+            { id: generateId(), weight: 30, reps: 10, completed: true },
+            { id: generateId(), weight: 30, reps: 10, completed: true },
+            { id: generateId(), weight: 30, reps: 9, completed: true },
+        ] },
+        { id: generateId(), name: 'Tricep Pushdown', sets: [
+            { id: generateId(), weight: 25, reps: 12, completed: true },
+            { id: generateId(), weight: 25, reps: 12, completed: true },
+            { id: generateId(), weight: 25, reps: 11, completed: true },
+        ]},
       ],
     },
     {
       id: generateId(),
       date: subDays(new Date(), 3).toISOString(),
       exercises: [
-        { id: generateId(), name: 'Squat', sets: 5, reps: 5, weight: 120 },
-        { id: generateId(), name: 'Leg Press', sets: 3, reps: 10, weight: 200 },
-        { id: generateId(), name: 'Leg Curl', sets: 3, reps: 12, weight: 50 },
+        { id: generateId(), name: 'Squat', sets: [
+            { id: generateId(), weight: 120, reps: 5, completed: true },
+            { id: generateId(), weight: 120, reps: 5, completed: true },
+            { id: generateId(), weight: 120, reps: 5, completed: true },
+            { id: generateId(), weight: 120, reps: 5, completed: true },
+            { id: generateId(), weight: 120, reps: 5, completed: true },
+        ]},
+        { id: generateId(), name: 'Leg Press', sets: [
+            { id: generateId(), weight: 200, reps: 10, completed: true },
+            { id: generateId(), weight: 200, reps: 10, completed: true },
+            { id: generateId(), weight: 200, reps: 10, completed: true },
+        ]},
+        { id: generateId(), name: 'Leg Curl', sets: [
+            { id: generateId(), weight: 50, reps: 12, completed: true },
+            { id: generateId(), weight: 50, reps: 12, completed: true },
+            { id: generateId(), weight: 50, reps: 12, completed: true },
+        ]},
       ],
     },
     {
       id: generateId(),
       date: subDays(new Date(), 5).toISOString(),
       exercises: [
-        { id: generateId(), name: 'Deadlift', sets: 3, reps: 5, weight: 150 },
-        { id: generateId(), name: 'Pull Ups', sets: 4, reps: 8, weight: 0 }, // Bodyweight
-        { id: generateId(), name: 'Barbell Row', sets: 3, reps: 8, weight: 70 },
+        { id: generateId(), name: 'Deadlift', sets: [
+            { id: generateId(), weight: 150, reps: 5, completed: true },
+            { id: generateId(), weight: 150, reps: 4, completed: true },
+            { id: generateId(), weight: 150, reps: 4, completed: true },
+        ]},
+        { id: generateId(), name: 'Pull Ups', sets: [
+            { id: generateId(), weight: 0, reps: 8, completed: true },
+            { id: generateId(), weight: 0, reps: 8, completed: true },
+            { id: generateId(), weight: 0, reps: 7, completed: true },
+            { id: generateId(), weight: 0, reps: 6, completed: true },
+        ] },
+        { id: generateId(), name: 'Barbell Row', sets: [
+            { id: generateId(), weight: 70, reps: 8, completed: true },
+            { id: generateId(), weight: 70, reps: 8, completed: true },
+            { id: generateId(), weight: 70, reps: 8, completed: true },
+        ]},
       ],
     },
     {
       id: generateId(),
       date: subDays(new Date(), 7).toISOString(),
       exercises: [
-        { id: generateId(), name: 'Bench Press', sets: 4, reps: 8, weight: 95 },
-        { id: generateId(), name: 'Overhead Press', sets: 4, reps: 8, weight: 50 },
-        { id: generateId(), name: 'Lateral Raises', sets: 3, reps: 15, weight: 10 },
+        { id: generateId(), name: 'Bench Press', sets: [
+            { id: generateId(), weight: 95, reps: 8, completed: true },
+            { id: generateId(), weight: 95, reps: 8, completed: true },
+            { id: generateId(), weight: 95, reps: 8, completed: true },
+            { id: generateId(), weight: 95, reps: 8, completed: true },
+        ]},
+        { id: generateId(), name: 'Overhead Press', sets: [
+             { id: generateId(), weight: 50, reps: 8, completed: true },
+             { id: generateId(), weight: 50, reps: 8, completed: true },
+             { id: generateId(), weight: 50, reps: 7, completed: true },
+             { id: generateId(), weight: 50, reps: 6, completed: true },
+        ]},
+        { id: generateId(), name: 'Lateral Raises', sets: [
+            { id: generateId(), weight: 10, reps: 15, completed: true },
+            { id: generateId(), weight: 10, reps: 15, completed: true },
+            { id: generateId(), weight: 10, reps: 14, completed: true },
+        ]},
       ],
     },
      {
       id: generateId(),
       date: subDays(new Date(), 10).toISOString(),
       exercises: [
-        { id: generateId(), name: 'Squat', sets: 5, reps: 5, weight: 115 },
+        { id: generateId(), name: 'Squat', sets: [
+            { id: generateId(), weight: 115, reps: 5, completed: true },
+            { id: generateId(), weight: 115, reps: 5, completed: true },
+            { id: generateId(), weight: 115, reps: 5, completed: true },
+        ]},
       ],
     },
     {
       id: generateId(),
       date: subDays(new Date(), 12).toISOString(),
       exercises: [
-        { id: generateId(), name: 'Bench Press', sets: 4, reps: 10, weight: 90 },
+        { id: generateId(), name: 'Bench Press', sets: [
+            { id: generateId(), weight: 90, reps: 10, completed: true },
+            { id: generateId(), weight: 90, reps: 10, completed: true },
+            { id: generateId(), weight: 90, reps: 9, completed: true },
+        ]},
       ],
     },
   ],

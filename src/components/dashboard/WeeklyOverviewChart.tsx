@@ -1,39 +1,51 @@
+
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { Workout } from "@/lib/types";
-import { subDays, getDay } from 'date-fns';
+import { subDays, getDay, format } from 'date-fns';
 import { TrendingUp } from "lucide-react";
 import { useMemo } from "react";
 
 const getWeekData = (workouts: Workout[] | undefined) => {
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    let data = weekDays.map(day => ({ name: day, workouts: 0, volume: 0 }));
+    let data = Array.from({ length: 7 }, (_, i) => {
+        const date = subDays(new Date(), 6 - i);
+        return { name: format(date, 'EEE'), workouts: 0, volume: 0, date };
+    });
 
     if (!workouts) return { data, totalVolume: 0 };
 
     const today = new Date();
     const oneWeekAgo = subDays(today, 6);
-    oneWeekAgo.setHours(0,0,0,0);
+    oneWeekAgo.setHours(0, 0, 0, 0);
 
     const thisWeekWorkouts = workouts.filter(w => new Date(w.date) >= oneWeekAgo);
 
+    const dataByDate = data.reduce((acc, item) => {
+        acc[format(item.date, 'yyyy-MM-dd')] = item;
+        return acc;
+    }, {} as Record<string, typeof data[0]>);
+
     thisWeekWorkouts.forEach(workout => {
-        const dayIndex = getDay(new Date(workout.date));
-        if (data[dayIndex]) {
-            data[dayIndex].workouts += 1;
+        const workoutDateStr = format(new Date(workout.date), 'yyyy-MM-dd');
+        const dayData = dataByDate[workoutDateStr];
+
+        if (dayData) {
+            if (!dayData.workouts) dayData.workouts = 0;
+            dayData.workouts += 1;
             workout.exercises.forEach(ex => {
-                data[dayIndex].volume += ex.sets * ex.reps * (ex.weight || 0);
+                if (!dayData.volume) dayData.volume = 0;
+                dayData.volume += ex.sets.reduce((acc, set) => acc + (set.reps * set.weight), 0);
             });
         }
     });
 
-    const totalVolume = data.reduce((acc, day) => acc + day.volume, 0);
-    const todayIndex = getDay(today);
-    const reorderedData = [...data.slice(todayIndex + 1), ...data.slice(0, todayIndex + 1)];
+    const finalData = Object.values(dataByDate).sort((a,b) => a.date.getTime() - b.date.getTime());
+    const totalVolume = finalData.reduce((acc, day) => acc + day.volume, 0);
     
-    return { data: reorderedData, totalVolume };
+    return { data: finalData, totalVolume };
 };
 
 export default function WeeklyOverviewChart({ workouts }: { workouts: Workout[] | undefined }) {

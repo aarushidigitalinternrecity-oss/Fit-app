@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
@@ -11,21 +12,41 @@ import { AreaChart } from 'lucide-react';
 const getProgressionData = (workouts: Workout[] | undefined, exerciseName: string | null) => {
     if (!workouts || !exerciseName) return [];
 
-    return workouts
-        .flatMap(w => w.exercises.map(ex => ({...ex, date: w.date})))
-        .filter(ex => ex.name === exerciseName && ex.weight > 0)
-        .map(ex => ({
-            date: format(new Date(ex.date), 'MMM d'),
-            weight: ex.weight,
-            fullDate: new Date(ex.date)
-        }))
-        .sort((a,b) => a.fullDate.getTime() - b.fullDate.getTime());
+    // Find the heaviest set for the selected exercise in each workout session
+    const progression = workouts.map(w => {
+        const relevantExercises = w.exercises.filter(ex => ex.name === exerciseName);
+        if (relevantExercises.length === 0) return null;
+
+        let bestSetForWorkout = { weight: 0, reps: 0 };
+        relevantExercises.forEach(ex => {
+            ex.sets.forEach(set => {
+                if (set.weight > bestSetForWorkout.weight) {
+                    bestSetForWorkout = { weight: set.weight, reps: set.reps };
+                }
+            })
+        });
+
+        if (bestSetForWorkout.weight === 0) return null;
+
+        return {
+            date: format(new Date(w.date), 'MMM d'),
+            weight: bestSetForWorkout.weight,
+            fullDate: new Date(w.date)
+        }
+    }).filter(Boolean);
+
+
+    return progression
+        .sort((a,b) => a!.fullDate.getTime() - b!.fullDate.getTime());
 };
 
 const getUniqueExercises = (workouts: Workout[] | undefined, customExercises: CustomExercise[] | undefined) => {
     const exerciseSet = new Set<string>();
     if (workouts) {
-        workouts.forEach(w => w.exercises.forEach(ex => ex.weight > 0 && exerciseSet.add(ex.name)));
+        workouts.forEach(w => w.exercises.forEach(ex => {
+          const hasWeight = ex.sets.some(s => s.weight > 0);
+          if (hasWeight) exerciseSet.add(ex.name)
+        }));
     }
     // No need to add custom exercises separately if we get them from workouts.
     // If a custom exercise has never been performed, it won't have progression data anyway.

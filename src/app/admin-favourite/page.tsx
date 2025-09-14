@@ -5,7 +5,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ADMIN_WORKOUTS, AdminWorkout, AdminWorkoutSection } from '@/lib/admin-workouts';
+import { ADMIN_WORKOUTS } from '@/lib/admin-workouts';
 import AppLayout from '@/components/layout/AppLayout';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,16 +15,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2 } from 'lucide-react';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 
+const exerciseSetSchema = z.object({
+  id: z.string(),
+  reps: z.coerce.number().min(0, "Reps can't be negative.").default(0),
+  weight: z.coerce.number().min(0, "Weight can't be negative.").default(0),
+  completed: z.boolean().default(false),
+});
 
 const exerciseSchema = z.object({
+  id: z.string(),
   name: z.string(),
-  sets: z.coerce.number(),
-  reps: z.coerce.number().min(0, "Reps can't be negative.").optional().default(0),
-  weight: z.coerce.number().min(0, "Weight can't be negative.").optional().default(0),
-  completed: z.boolean().default(false),
+  sets: z.array(exerciseSetSchema),
 });
 
 const workoutFormSchema = z.object({
@@ -45,52 +48,70 @@ export default function AdminFavouritePage() {
         defaultValues: { exercises: [] }
     });
 
-    const { fields, replace, update } = useFieldArray({
-        control: form.control,
+    const { control, reset, watch, handleSubmit } = form;
+    const { fields, replace } = useFieldArray({
+        control,
         name: "exercises"
     });
 
     useEffect(() => {
-        const flattenedExercises = ADMIN_WORKOUTS[selectedWorkout].flatMap(section =>
+        const newExercises = ADMIN_WORKOUTS[selectedWorkout].flatMap(section =>
             section.exercises.map(ex => ({
+                id: crypto.randomUUID(),
                 name: ex.name,
-                sets: ex.defaultSets,
-                reps: ex.defaultReps,
-                weight: 0,
-                completed: false,
+                sets: Array.from({ length: ex.defaultSets }, () => ({
+                    id: crypto.randomUUID(),
+                    reps: ex.defaultReps,
+                    weight: 0,
+                    completed: false,
+                }))
             }))
         );
-        // We need to type cast here because of RHF's strict typing on `replace`.
-        replace(flattenedExercises as (z.infer<typeof exerciseSchema> & { id?: string | undefined; })[]);
+        replace(newExercises);
     }, [selectedWorkout, replace]);
 
     const onSubmit = (data: WorkoutFormData) => {
-        const loggedExercises = data.exercises
-            .filter(ex => ex.completed)
-            .map(ex => ({
-                id: crypto.randomUUID(),
-                name: ex.name,
-                sets: ex.sets,
-                reps: ex.reps || 0,
-                weight: ex.weight || 0,
-            }));
+        const loggedWorkout = {
+            date: new Date().toISOString(),
+            exercises: data.exercises
+                .map(ex => ({
+                    ...ex,
+                    sets: ex.sets.filter(s => s.completed),
+                }))
+                .filter(ex => ex.sets.length > 0)
+        };
 
-        if (loggedExercises.length > 0) {
-            addWorkout({
-                date: new Date().toISOString(),
-                exercises: loggedExercises,
-            });
+        if (loggedWorkout.exercises.length > 0) {
+            addWorkout(loggedWorkout);
         }
-        form.reset();
+        
+        // Reset completion status but keep structure
+        const currentExercises = watch('exercises');
+        const resetExercises = currentExercises.map(ex => ({
+            ...ex,
+            sets: ex.sets.map(s => ({...s, completed: false, weight: 0}))
+        }));
+        reset({ exercises: resetExercises });
     };
     
     const workoutProgress = useMemo(() => {
-        const watchedExercises = form.watch('exercises');
-        if (!watchedExercises) return 0;
-        const completedCount = watchedExercises.filter(ex => ex.completed).length;
-        const totalCount = watchedExercises.length;
+        const watchedExercises = watch('exercises');
+        if (!watchedExercises || watchedExercises.length === 0) return 0;
+        
+        let completedCount = 0;
+        let totalCount = 0;
+        
+        watchedExercises.forEach(ex => {
+            ex.sets.forEach(set => {
+                totalCount++;
+                if (set.completed) {
+                    completedCount++;
+                }
+            })
+        });
+
         return totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
-    }, [form]);
+    }, [watch]);
 
 
     return (
@@ -116,7 +137,7 @@ export default function AdminFavouritePage() {
                 </Card>
 
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <Card>
                             <CardHeader>
                                 <CardTitle>{selectedWorkout} Day</CardTitle>
@@ -129,66 +150,69 @@ export default function AdminFavouritePage() {
                             </CardHeader>
                         </Card>
 
-                        {workoutData.map((section, sectionIndex) => (
-                            <Card key={sectionIndex}>
-                                <CardHeader>
-                                    <CardTitle className="text-lg">{section.title}</CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    {section.exercises.map((exercise, exerciseIndex) => {
-                                        const fieldIndex = workoutData.slice(0, sectionIndex).reduce((acc, sec) => acc + sec.exercises.length, 0) + exerciseIndex;
-                                        const field = fields[fieldIndex];
-
-                                        return field ? (
-                                            <div key={field.id}>
-                                                <div className="flex items-start gap-4">
-                                                    <Controller
-                                                        control={form.control}
-                                                        name={`exercises.${fieldIndex}.completed`}
-                                                        render={({ field: checkboxField }) => (
-                                                            <Checkbox
-                                                                checked={checkboxField.value}
-                                                                onCheckedChange={checkboxField.onChange}
-                                                                className="mt-1"
-                                                                id={`completed-${field.id}`}
-                                                            />
-                                                        )}
-                                                    />
-                                                    <div className="flex-1 space-y-2">
-                                                        <Label htmlFor={`completed-${field.id}`} className="font-semibold text-base">{exercise.name}</Label>
-                                                        <p className="text-sm text-muted-foreground">{exercise.details}</p>
-
-                                                        <div className="grid grid-cols-2 gap-2 sm:gap-4 mt-2">
-                                                            <FormField
-                                                                control={form.control}
-                                                                name={`exercises.${fieldIndex}.weight`}
-                                                                render={({ field }) => (
-                                                                    <FormItem>
-                                                                        <Label>Weight (kg)</Label>
-                                                                        <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
-                                                             <FormField
-                                                                control={form.control}
-                                                                name={`exercises.${fieldIndex}.reps`}
-                                                                render={({ field }) => (
-                                                                    <FormItem>
-                                                                        <Label>Reps</Label>
-                                                                        <FormControl><Input type="number" placeholder="0" {...field} /></FormControl>
-                                                                    </FormItem>
-                                                                )}
-                                                            />
+                        {workoutData.map((section) => {
+                            const sectionExercises = fields.filter(field => 
+                                section.exercises.some(ex => ex.name === field.name)
+                            );
+                            
+                            return (
+                                <Card key={section.title}>
+                                    <CardHeader>
+                                        <CardTitle className="text-lg">{section.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        {sectionExercises.map((field, index) => {
+                                            const exerciseIndex = fields.findIndex(f => f.id === field.id);
+                                            const originalExerciseInfo = section.exercises.find(e => e.name === field.name);
+                                            return (
+                                                <div key={field.id}>
+                                                    <div>
+                                                        <p className="font-semibold text-base">{field.name}</p>
+                                                        <p className="text-sm text-muted-foreground">{originalExerciseInfo?.details}</p>
+                                                        <div className="space-y-2 mt-2">
+                                                            <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-x-2 items-center text-sm font-medium text-muted-foreground px-2">
+                                                                <span className="text-center">Set</span>
+                                                                <span className="text-center">Weight (kg)</span>
+                                                                <span className="text-center">Reps</span>
+                                                                <span className="text-center">Done</span>
+                                                            </div>
+                                                            {field.sets.map((set, setIndex) => (
+                                                                <div key={set.id} className="grid grid-cols-[auto_1fr_1fr_auto] gap-x-2 items-center">
+                                                                    <Label className="font-bold text-center">{setIndex + 1}</Label>
+                                                                    <FormField
+                                                                        control={control}
+                                                                        name={`exercises.${exerciseIndex}.sets.${setIndex}.weight`}
+                                                                        render={({ field }) => <Input type="number" placeholder="0" {...field} className="text-center" />}
+                                                                    />
+                                                                    <FormField
+                                                                        control={control}
+                                                                        name={`exercises.${exerciseIndex}.sets.${setIndex}.reps`}
+                                                                        render={({ field }) => <Input type="number" placeholder="0" {...field} className="text-center" />}
+                                                                    />
+                                                                    <Controller
+                                                                        control={control}
+                                                                        name={`exercises.${exerciseIndex}.sets.${setIndex}.completed`}
+                                                                        render={({ field: checkboxField }) => (
+                                                                             <div className="flex justify-center">
+                                                                                <Checkbox
+                                                                                    checked={checkboxField.value}
+                                                                                    onCheckedChange={checkboxField.onChange}
+                                                                                />
+                                                                            </div>
+                                                                        )}
+                                                                    />
+                                                                </div>
+                                                            ))}
                                                         </div>
                                                     </div>
+                                                    {index < sectionExercises.length - 1 && <Separator className="my-4" />}
                                                 </div>
-                                                {exerciseIndex < section.exercises.length - 1 && <Separator className="my-4" />}
-                                            </div>
-                                        ) : null;
-                                    })}
-                                </CardContent>
-                            </Card>
-                        ))}
+                                            )
+                                        })}
+                                    </CardContent>
+                                </Card>
+                            )
+                        })}
                          <Button type="submit" className="w-full">Log Completed Exercises</Button>
                     </form>
                 </Form>

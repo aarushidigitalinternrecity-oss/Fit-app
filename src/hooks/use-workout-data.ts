@@ -1,8 +1,9 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
 import { MOCK_DATA } from '@/lib/mock-data';
-import type { AppData, Workout, PersonalRecord, CustomExercise, PersonalGoal } from '@/lib/types';
+import type { AppData, Workout, PersonalRecord, CustomExercise, PersonalGoal, Exercise } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 
 const DATA_KEY = 'vibefit_data';
@@ -59,13 +60,16 @@ export function useWorkoutData() {
     // Check for new Personal Records
     const currentPRs = calculatePersonalRecords(data.workouts);
     workoutWithId.exercises.forEach(exercise => {
-      const existingPR = currentPRs.find(pr => pr.exerciseName === exercise.name);
-      if (!existingPR || exercise.weight > existingPR.weight) {
-        toast({
-          title: "🎉 New PR Unlocked!",
-          description: `${exercise.name}: ${exercise.weight}kg for ${exercise.reps} reps`,
-        });
-      }
+      exercise.sets.forEach(set => {
+        if (!set.completed) return;
+        const existingPR = currentPRs.find(pr => pr.exerciseName === exercise.name);
+        if (!existingPR || set.weight > existingPR.weight) {
+          toast({
+            title: "🎉 New PR Unlocked!",
+            description: `${exercise.name}: ${set.weight}kg for ${set.reps} reps`,
+          });
+        }
+      });
     });
 
     const newData: AppData = {
@@ -152,37 +156,45 @@ export const calculatePersonalRecords = (workouts: Workout[] | undefined): Perso
     
     if (!workouts) return [];
 
-    // Flatten all exercises from all workouts into a single array with dates
-    const allExercises = workouts.flatMap(workout => 
-        workout.exercises.map(exercise => ({...exercise, date: workout.date}))
+    // Flatten all sets from all exercises from all workouts into a single array with dates and names
+    const allSets = workouts.flatMap(workout => 
+        workout.exercises.flatMap(exercise => 
+            exercise.sets.map(set => ({
+                ...set,
+                name: exercise.name,
+                date: workout.date
+            }))
+        )
     );
 
-    // Group exercises by name
-    const exercisesByName: { [key: string]: typeof allExercises } = allExercises.reduce((acc, ex) => {
-        if (!acc[ex.name]) {
-            acc[ex.name] = [];
+    // Group sets by exercise name
+    const exercisesByName: { [key: string]: typeof allSets } = allSets.reduce((acc, set) => {
+        if (!acc[set.name]) {
+            acc[set.name] = [];
         }
-        acc[ex.name].push(ex);
+        acc[set.name].push(set);
         return acc;
-    }, {} as { [key: string]: typeof allExercises });
+    }, {} as { [key: string]: typeof allSets });
 
     // Find the PR for each exercise group
     for (const exerciseName in exercisesByName) {
-        const sortedExercises = exercisesByName[exerciseName].sort((a, b) => {
+        const sortedSets = exercisesByName[exerciseName].sort((a, b) => {
             // Prioritize higher weight, then higher reps, then more recent date
             if (b.weight !== a.weight) return b.weight - a.weight;
             if (b.reps !== a.reps) return b.reps - a.reps;
             return new Date(b.date).getTime() - new Date(a.date).getTime();
         });
 
-        const bestPerformance = sortedExercises[0];
+        const bestPerformance = sortedSets[0];
         
-        prs[exerciseName] = {
-            exerciseName: bestPerformance.name,
-            weight: bestPerformance.weight,
-            reps: bestPerformance.reps,
-            date: bestPerformance.date,
-        };
+        if (bestPerformance) {
+            prs[exerciseName] = {
+                exerciseName: bestPerformance.name,
+                weight: bestPerformance.weight,
+                reps: bestPerformance.reps,
+                date: bestPerformance.date,
+            };
+        }
     }
 
     return Object.values(prs).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());

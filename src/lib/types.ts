@@ -1,9 +1,15 @@
+
+export type ExerciseSet = {
+  id: string;
+  weight: number;
+  reps: number;
+  completed: boolean;
+};
+
 export type Exercise = {
   id: string;
   name: string;
-  sets: number;
-  reps: number;
-  weight: number;
+  sets: ExerciseSet[];
 };
 
 export type Workout = {

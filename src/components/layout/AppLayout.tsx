@@ -2,14 +2,13 @@
 
 import { VibeFitLogo } from '@/components/VibeFitLogo';
 import { Button } from '@/components/ui/button';
-import { Dumbbell, Plus } from 'lucide-react';
+import { Plus, BookOpen } from 'lucide-react';
 import { Sheet, SheetTrigger } from '@/components/ui/sheet';
 import WorkoutLogger from '@/components/workout/WorkoutLogger';
 import { useState } from 'react';
 import { useWorkoutData } from '@/hooks/use-workout-data';
 import BottomNav from './BottomNav';
 import Link from 'next/link';
-import { BookOpen } from 'lucide-react';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { data, addWorkout } = useWorkoutData();

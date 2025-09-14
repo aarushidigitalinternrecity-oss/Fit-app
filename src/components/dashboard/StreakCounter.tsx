@@ -46,8 +46,8 @@ export default function StreakCounter({ workouts }: { workouts: Workout[] | unde
       </CardHeader>
       <CardContent className="p-2">
         <div className="flex items-center justify-center gap-2">
-          <span className="text-5xl sm:text-6xl font-bold text-primary">{streak}</span>
-          <Flame className="size-10 sm:size-12 text-orange-500" />
+          <span className="text-4xl font-bold text-primary">{streak}</span>
+          <Flame className="size-8 text-orange-500" />
         </div>
         <p className="text-muted-foreground mt-1 text-sm">day streak</p>
       </CardContent>

@@ -75,10 +75,10 @@ export default function ProgressRings({ workouts, weeklyGoal }: { workouts: Work
         <CardTitle className="text-base md:text-lg">Weekly Goal</CardTitle>
       </CardHeader>
       <CardContent className="p-2 flex-grow flex items-center justify-center">
-        <div className="relative w-[120px] h-[120px] sm:w-[150px] sm:h-[150px]">
-            <CircleProgress percentage={percentage} size={150} />
+        <div className="relative w-[120px] h-[120px]">
+            <CircleProgress percentage={percentage} size={120} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl sm:text-3xl font-bold">{workoutsDone}</span>
+                <span className="text-2xl font-bold">{workoutsDone}</span>
                 <span className="text-sm text-muted-foreground">/{goal}</span>
             </div>
         </div>

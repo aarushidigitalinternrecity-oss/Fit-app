@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -16,7 +17,7 @@ const SuggestWorkoutInputSchema = z.object({
   fitnessGoals: z.string().describe('The user\'s primary fitness goals.'),
   personalRecords: z.string().describe('A summary of the user\'s personal records for key lifts.'),
   availableExercises: z.array(z.string()).describe('A list of exercises the user has available to them.'),
-  workoutSplit: z.string().describe('The desired workout split for the suggestion (e.g., "Full Body", "Upper Body", "Lower Body", "Push", "Pull", "Legs").'),
+  workoutSplit: z.string().describe('The desired workout split for the suggestion (e.g., "Full Body", "Upper Body", "Lower Body", "Push", "Pull", "Legs", "Chest", "Back", "Shoulders", "Arms").'),
 });
 export type SuggestWorkoutInput = z.infer<typeof SuggestWorkoutInputSchema>;
 
@@ -44,7 +45,7 @@ const prompt = ai.definePrompt({
   name: 'suggestWorkoutPrompt',
   input: {schema: SuggestWorkoutInputSchema},
   output: {schema: SuggestWorkoutOutputSchema},
-  prompt: `You are an expert fitness coach named "Turbo Granny Coach". Your task is to create a personalized workout suggestion for a user based on their data and chosen workout split. The workout should be effective, safe, and aligned with their goals.
+  prompt: `You are an expert fitness coach named "Turbo Granny Coach". Your task is to create a personalized workout suggestion for a user based on their data and chosen workout split. The workout should be effective, safe, and aligned with their goals, incorporating a mix of classic and modern gym exercises.
 
 Analyze the following user data:
 - Fitness Goals: {{{fitnessGoals}}}
@@ -71,3 +72,4 @@ const suggestWorkoutFlow = ai.defineFlow(
     return output!;
   }
 );
+

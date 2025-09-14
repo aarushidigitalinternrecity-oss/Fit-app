@@ -159,11 +159,13 @@ export const calculatePersonalRecords = (workouts: Workout[] | undefined): Perso
     // Flatten all sets from all exercises from all workouts into a single array with dates and names
     const allSets = workouts.flatMap(workout => 
         workout.exercises.flatMap(exercise => 
-            exercise.sets.map(set => ({
+            (Array.isArray(exercise.sets) && exercise.sets.length > 0)
+            ? exercise.sets.map(set => ({
                 ...set,
                 name: exercise.name,
                 date: workout.date
             }))
+            : []
         )
     );
 

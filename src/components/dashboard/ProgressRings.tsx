@@ -1,0 +1,88 @@
+"use client";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Workout } from "@/lib/types";
+import { subDays, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+import { useEffect, useState } from "react";
+
+const getWorkoutsThisWeek = (workouts: Workout[] | undefined) => {
+    if (!workouts) return 0;
+    const today = new Date();
+    const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday
+    const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
+    
+    const uniqueDaysThisWeek = new Set(
+        workouts
+            .filter(w => isWithinInterval(new Date(w.date), { start: weekStart, end: weekEnd }))
+            .map(w => w.date.split('T')[0])
+    );
+    
+    return uniqueDaysThisWeek.size;
+}
+
+const CircleProgress = ({ percentage, size = 100 }: { percentage: number, size?: number }) => {
+    const strokeWidth = 8;
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const [offset, setOffset] = useState(circumference);
+
+    useEffect(() => {
+        const progressOffset = circumference - (percentage / 100) * circumference;
+        setOffset(progressOffset);
+    }, [percentage, circumference]);
+
+
+    return (
+        <svg width={size} height={size} className="-rotate-90">
+            <circle
+                className="text-muted"
+                stroke="currentColor"
+                strokeWidth={strokeWidth}
+                fill="transparent"
+                r={radius}
+                cx={size / 2}
+                cy={size / 2}
+            />
+            <circle
+                className="text-primary"
+                stroke="currentColor"
+                strokeWidth={strokeWidth}
+                strokeDasharray={circumference}
+                strokeDashoffset={offset}
+                strokeLinecap="round"
+                fill="transparent"
+                r={radius}
+                cx={size / 2}
+                cy={size / 2}
+                style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}
+            />
+        </svg>
+    );
+};
+
+export default function ProgressRings({ workouts, weeklyGoal }: { workouts: Workout[] | undefined, weeklyGoal: number | undefined }) {
+  const [workoutsDone, setWorkoutsDone] = useState(0);
+
+  useEffect(() => {
+    setWorkoutsDone(getWorkoutsThisWeek(workouts));
+  }, [workouts]);
+
+  const goal = weeklyGoal || 5;
+  const percentage = Math.min((workoutsDone / goal) * 100, 100);
+
+  return (
+    <Card className="flex flex-col items-center justify-center text-center h-full">
+      <CardHeader className="pb-2">
+        <CardTitle>Weekly Goal</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="relative">
+            <CircleProgress percentage={percentage} />
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold">{workoutsDone}</span>
+                <span className="text-sm text-muted-foreground">/{goal}</span>
+            </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

@@ -1,5 +1,5 @@
 import type { AppData } from '@/lib/types';
-import { subDays } from 'date-fns';
+import { subDays, addMonths } from 'date-fns';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -72,5 +72,10 @@ export const MOCK_DATA: AppData = {
   customExercises: [
     { id: generateId(), name: 'Cable Crossover', muscleGroup: 'Chest' },
     { id: generateId(), name: 'Hammer Curls', muscleGroup: 'Arms' },
+  ],
+  personalGoals: [
+    { id: generateId(), exerciseName: 'Bench Press', targetWeight: 110, targetReps: 5, deadline: addMonths(new Date(), 1).toISOString() },
+    { id: generateId(), exerciseName: 'Squat', targetWeight: 130, targetReps: 5 },
+    { id: generateId(), exerciseName: 'Pull Ups', targetWeight: 0, targetReps: 12 },
   ],
 };

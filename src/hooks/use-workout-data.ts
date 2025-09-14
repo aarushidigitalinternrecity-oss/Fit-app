@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { MOCK_DATA } from '@/lib/mock-data';
-import type { AppData, Workout, PersonalRecord, CustomExercise } from '@/lib/types';
+import type { AppData, Workout, PersonalRecord, CustomExercise, PersonalGoal } from '@/lib/types';
 import { useToast } from "@/hooks/use-toast";
 
 const DATA_KEY = 'vibefit_data';
@@ -17,9 +17,11 @@ export function useWorkoutData() {
       const storedData = localStorage.getItem(DATA_KEY);
       if (storedData) {
         const parsedData = JSON.parse(storedData);
-        // Ensure customExercises is an array
         if (!Array.isArray(parsedData.customExercises)) {
             parsedData.customExercises = [];
+        }
+        if (!Array.isArray(parsedData.personalGoals)) {
+            parsedData.personalGoals = [];
         }
         setData(parsedData);
       } else {
@@ -54,8 +56,7 @@ export function useWorkoutData() {
       if (!existingPR || exercise.weight > existingPR.weight) {
         toast({
           title: "🎉 New PR Unlocked!",
-          description: `${exercise.name}: ${exercise.weight}kg`,
-          className: "bg-primary text-primary-foreground border-green-400",
+          description: `${exercise.name}: ${exercise.weight}kg for ${exercise.reps} reps`,
         });
       }
     });
@@ -98,7 +99,38 @@ export function useWorkoutData() {
     toast({ title: "🗑️ Exercise deleted", description: `"${exerciseToDelete.name}" has been removed.` });
   }, [data, saveData, toast]);
 
-  return { data, loading, addWorkout, addCustomExercise, editCustomExercise, deleteCustomExercise };
+  const addPersonalGoal = useCallback((goal: Omit<PersonalGoal, 'id'>) => {
+    if (!data) return;
+    const newGoal = { ...goal, id: crypto.randomUUID() };
+    const newData: AppData = {
+      ...data,
+      personalGoals: [...(data.personalGoals || []), newGoal],
+    };
+    saveData(newData);
+    toast({ title: "🎯 Goal Set!", description: `New goal for ${newGoal.exerciseName} added.` });
+  }, [data, saveData, toast]);
+
+  const editPersonalGoal = useCallback((goalToUpdate: PersonalGoal) => {
+    if (!data) return;
+    const updatedGoals = (data.personalGoals || []).map(g => 
+        g.id === goalToUpdate.id ? goalToUpdate : g
+    );
+    const newData: AppData = { ...data, personalGoals: updatedGoals };
+    saveData(newData);
+    toast({ title: "✅ Goal Updated!", description: `Your goal for ${goalToUpdate.exerciseName} has been updated.` });
+  }, [data, saveData, toast]);
+
+  const deletePersonalGoal = useCallback((goalId: string) => {
+    if (!data) return;
+    const goalToDelete = (data.personalGoals || []).find(g => g.id === goalId);
+    if(!goalToDelete) return;
+    const updatedGoals = (data.personalGoals || []).filter(g => g.id !== goalId);
+    const newData: AppData = { ...data, personalGoals: updatedGoals };
+    saveData(newData);
+    toast({ title: "🗑️ Goal Removed", description: `The goal for ${goalToDelete.exerciseName} has been removed.` });
+  }, [data, saveData, toast]);
+
+  return { data, loading, addWorkout, addCustomExercise, editCustomExercise, deleteCustomExercise, addPersonalGoal, editPersonalGoal, deletePersonalGoal };
 }
 
 export const calculatePersonalRecords = (workouts: Workout[]): PersonalRecord[] => {
@@ -110,17 +142,27 @@ export const calculatePersonalRecords = (workouts: Workout[]): PersonalRecord[] 
 
     sortedWorkouts.forEach(workout => {
         workout.exercises.forEach(exercise => {
-            if (exercise.weight > 0) {
-                if (!prs[exercise.name] || exercise.weight >= prs[exercise.name].weight) {
-                    prs[exercise.name] = {
-                        exerciseName: exercise.name,
-                        weight: exercise.weight,
-                        date: workout.date,
-                    };
-                }
+            // Simple PR logic: highest weight for a given number of reps.
+            // A more complex logic could calculate 1-rep max.
+            const prKey = `${exercise.name}-${exercise.reps}`;
+            if (!prs[prKey] || exercise.weight >= prs[prKey].weight) {
+                prs[prKey] = {
+                    exerciseName: exercise.name,
+                    weight: exercise.weight,
+                    reps: exercise.reps,
+                    date: workout.date,
+                };
             }
         });
     });
 
-    return Object.values(prs).sort((a, b) => b.weight - a.weight);
+    // To simplify, we'll return the PR with the highest weight for each exercise
+    const finalPrs: { [key: string]: PersonalRecord } = {};
+    Object.values(prs).forEach(pr => {
+        if (!finalPrs[pr.exerciseName] || pr.weight > finalPrs[pr.exerciseName].weight) {
+            finalPrs[pr.exerciseName] = pr;
+        }
+    });
+
+    return Object.values(finalPrs).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };

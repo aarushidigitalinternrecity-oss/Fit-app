@@ -15,7 +15,16 @@ export type Workout = {
 export type PersonalRecord = {
   exerciseName: string;
   weight: number;
+  reps: number;
   date: string; // ISO string
+};
+
+export type PersonalGoal = {
+  id: string;
+  exerciseName: string;
+  targetWeight: number;
+  targetReps: number;
+  deadline?: string; // ISO string
 };
 
 export type CustomExercise = {
@@ -33,4 +42,5 @@ export type AppData = {
     };
   },
   customExercises: CustomExercise[];
+  personalGoals: PersonalGoal[];
 };

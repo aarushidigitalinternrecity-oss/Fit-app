@@ -12,7 +12,9 @@ export default function TodaySummary({ workouts }: { workouts: Workout[] | undef
 
   // Flatten sets for display
   const allSetsToday: (ExerciseSet & { exerciseName: string })[] = allExercisesToday.flatMap(ex =>
-    ex.sets.map(set => ({ ...set, exerciseName: ex.name }))
+    (Array.isArray(ex.sets) && ex.sets.length > 0) 
+      ? ex.sets.map(set => ({ ...set, exerciseName: ex.name }))
+      : []
   );
 
   return (
@@ -40,7 +42,7 @@ export default function TodaySummary({ workouts }: { workouts: Workout[] | undef
               </TableHeader>
               <TableBody>
                 {allExercisesToday.map((ex) => (
-                  ex.sets.map((set, setIndex) => (
+                  (ex.sets && ex.sets.length > 0) && ex.sets.map((set, setIndex) => (
                     <TableRow key={`${ex.id}-${set.id}`}>
                       <TableCell className="font-medium">{setIndex === 0 ? ex.name : ''}</TableCell>
                       <TableCell className="text-right">{setIndex + 1}</TableCell>

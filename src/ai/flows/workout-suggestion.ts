@@ -27,11 +27,11 @@ const SuggestWorkoutOutputSchema = z.object({
     intensity: z.string().describe('The target intensity level for the workout (e.g., "Moderate", "High", "Light").'),
     suggestedExercises: z.array(z.object({
         name: z.string().describe('The name of the exercise.'),
-        sets: z.literal(4).describe('The number of sets to perform. This must be 4.'),
+        sets: z.coerce.number().describe('The number of sets to perform.'),
         reps: z.string().describe('The target repetition range (e.g., "8-12" or "5").'),
         weight: z.string().describe('The recommended weight in kg, or "Bodyweight". Should be based on user\'s personal records if available, otherwise suggest a starting weight.'),
         tip: z.string().optional().describe('An optional short tip for performing the exercise correctly or maximizing its benefit.'),
-    })).length(8).describe('An array of exactly 8 exercises to perform for the workout.'),
+    })).describe('An array of exactly 8 exercises to perform for the workout.'),
 });
 export type SuggestWorkoutOutput = z.infer<typeof SuggestWorkoutOutputSchema>;
 
@@ -53,7 +53,7 @@ Analyze the following user data:
 - Available Exercises: {{{json availableExercises}}}
 - Desired Workout Split: {{{workoutSplit}}}
 
-Based on this data, generate a structured workout suggestion with exactly 8 exercises. Each exercise must have exactly 4 sets. The exercises should be chosen from the provided list of available exercises and be appropriate for the selected workout split.
+Based on this data, generate a structured workout suggestion with exactly 8 exercises. Each exercise must have 4 sets. The exercises should be chosen from the provided list of available exercises and be appropriate for the selected workout split.
 For the recommended weight, analyze the user's PRs. If a relevant PR exists, suggest a challenging but achievable weight (e.g., 80-90% of PR for strength-focused reps, or 60-75% for hypertrophy-focused reps). If no PR is available, suggest a reasonable starting weight or "Bodyweight".
 
 Your response must be in the structured format defined by the output schema. Ensure all fields are populated with relevant, high-quality information.`,

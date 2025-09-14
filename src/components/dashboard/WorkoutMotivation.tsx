@@ -1,7 +1,8 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Bot } from "lucide-react";
 import { personalizedWorkoutMotivation } from "@/ai/flows/personalized-workout-motivation";
@@ -40,7 +41,14 @@ export default function WorkoutMotivation({ workouts }: { workouts: Workout[] | 
   };
 
   useEffect(() => {
-    getMotivation();
+    // Only fetch motivation if there are workouts to analyze
+    if (workouts && workouts.length > 0) {
+      getMotivation();
+    } else {
+        setMotivation("Log a workout to get your first personalized tip!");
+        setLoading(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workouts]);
 
   return (
@@ -65,12 +73,12 @@ export default function WorkoutMotivation({ workouts }: { workouts: Workout[] | 
             </blockquote>
         )}
       </CardContent>
-      <div className="p-6 pt-0">
-        <Button onClick={getMotivation} disabled={loading} variant="ghost" className="w-full">
+      <CardFooter>
+        <Button onClick={getMotivation} disabled={loading} className="w-full">
           <Sparkles className="mr-2 h-4 w-4" />
-          {loading ? "Generating..." : "Get a new tip"}
+          {loading ? "Generating..." : "Get a New Tip"}
         </Button>
-      </div>
+      </CardFooter>
     </Card>
   );
 }

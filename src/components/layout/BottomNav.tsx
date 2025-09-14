@@ -21,69 +21,48 @@ export default function BottomNav() {
   const [isWorkoutLoggerOpen, setIsWorkoutLoggerOpen] = useState(false);
 
   return (
-    <>
-      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg md:hidden z-50">
-        <div className="flex justify-around items-center h-16">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center text-center px-3 py-2">
-                <item.icon
-                  className={cn(
-                    'h-6 w-6 mb-1 transition-colors',
-                    isActive ? 'text-primary' : 'text-muted-foreground'
-                  )}
-                />
-                <span
-                  className={cn(
-                    'text-xs font-medium transition-colors',
-                    isActive ? 'text-primary' : 'text-muted-foreground'
-                  )}
-                >
-                  {item.label}
-                </span>
-                {isActive && (
-                    <div className="absolute top-0 h-1 w-8 bg-primary rounded-b-full animate-glow"></div>
+    <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border shadow-lg md:hidden z-50">
+      <div className="flex justify-around items-center h-16">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link key={item.href} href={item.href} className="flex flex-col items-center justify-center text-center px-3 py-2 relative">
+              <item.icon
+                className={cn(
+                  'h-6 w-6 mb-1 transition-colors',
+                  isActive ? 'text-primary' : 'text-muted-foreground'
                 )}
-              </Link>
-            );
-          })}
-          <Sheet open={isWorkoutLoggerOpen} onOpenChange={setIsWorkoutLoggerOpen}>
-            <SheetTrigger asChild>
-                <button className="flex flex-col items-center justify-center text-center px-3 py-2 text-muted-foreground">
-                    <div className="bg-primary text-primary-foreground rounded-full p-3 mb-1">
-                        <Plus className="h-6 w-6" />
-                    </div>
-                    <span className="text-xs font-medium">Log</span>
-                </button>
-            </SheetTrigger>
-            <WorkoutLogger 
-                addWorkout={addWorkout} 
-                customExercises={data?.customExercises}
-                onSheetClose={() => setIsWorkoutLoggerOpen(false)}
-            />
-          </Sheet>
-        </div>
-      </nav>
-      <WorkoutLoggerSheet 
-        isOpen={isWorkoutLoggerOpen}
-        setIsOpen={setIsWorkoutLoggerOpen}
-        addWorkout={addWorkout}
-        customExercises={data?.customExercises}
-      />
-    </>
+              />
+              <span
+                className={cn(
+                  'text-xs font-medium transition-colors',
+                  isActive ? 'text-primary' : 'text-muted-foreground'
+                )}
+              >
+                {item.label}
+              </span>
+              {isActive && (
+                  <div className="absolute top-0 h-1 w-8 bg-primary rounded-b-full animate-glow"></div>
+              )}
+            </Link>
+          );
+        })}
+        <Sheet open={isWorkoutLoggerOpen} onOpenChange={setIsWorkoutLoggerOpen}>
+          <SheetTrigger asChild>
+              <button className="flex flex-col items-center justify-center text-center px-3 py-2 text-muted-foreground">
+                  <div className="bg-primary text-primary-foreground rounded-full p-3 mb-1">
+                      <Plus className="h-6 w-6" />
+                  </div>
+                  <span className="text-xs font-medium">Log</span>
+              </button>
+          </SheetTrigger>
+          <WorkoutLogger 
+              addWorkout={addWorkout} 
+              customExercises={data?.customExercises}
+              onSheetClose={() => setIsWorkoutLoggerOpen(false)}
+          />
+        </Sheet>
+      </div>
+    </nav>
   );
 }
-
-function WorkoutLoggerSheet({ isOpen, setIsOpen, addWorkout, customExercises }: any) {
-    return (
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <WorkoutLogger
-                addWorkout={addWorkout}
-                customExercises={customExercises}
-                onSheetClose={() => setIsOpen(false)}
-            />
-        </Sheet>
-    );
-}
-

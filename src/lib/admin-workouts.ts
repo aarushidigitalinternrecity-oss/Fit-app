@@ -29,6 +29,9 @@ export const ADMIN_WORKOUTS: AdminWorkout = {
         { name: "Dumbbell Bench Press", details: "3 sets of 10-12 reps", defaultSets: 3, defaultReps: 11 },
         { name: "Dumbbell Overhead Press", details: "3 sets of 8-10 reps", defaultSets: 3, defaultReps: 9 },
         { name: "Dumbbell Tricep Kickbacks", details: "3 sets of 12-15 reps per arm", defaultSets: 3, defaultReps: 14 },
+        { name: "Dumbbell Pullover", details: "3 sets of 10-12 reps", defaultSets: 3, defaultReps: 11 },
+        { name: "Dumbbell Flies", details: "3 sets of 10-12 reps", defaultSets: 3, defaultReps: 11 },
+        { name: "Dumbbell Around the World", details: "3 sets of 8-10 reps", defaultSets: 3, defaultReps: 9 },
       ],
     },
     {
@@ -43,56 +46,73 @@ export const ADMIN_WORKOUTS: AdminWorkout = {
       exercises: [
         { name: "Landmine Press", details: "3 sets of 8-10 reps per side", defaultSets: 3, defaultReps: 9 },
         { name: "Landmine Tricep Extensions", details: "3 sets of 10-12 reps", defaultSets: 3, defaultReps: 11 },
+        { name: "Landmine Chest Press", details: "3 sets of 8-10 reps", defaultSets: 3, defaultReps: 9 },
+        { name: "Single Hand Landmine Push", details: "3 sets of 8-10 reps per side", defaultSets: 3, defaultReps: 9 },
       ],
     },
   ],
   Pull: [
     {
-      title: "Warm-up",
+      title: "Boxing",
       exercises: [
-        { name: "Jumping Jacks", details: "3 rounds (1 min)", defaultSets: 3, defaultReps: 0 },
-        { name: "Arm Circles", details: "2 sets of 15 reps", defaultSets: 2, defaultReps: 15 },
+        { name: "Speed Bag Drills", details: "3 sets of 2 min", defaultSets: 3, defaultReps: 0 },
+        { name: "Heavy Bag Combinations", details: "3 rounds (3 min)", defaultSets: 3, defaultReps: 0 },
       ],
     },
     {
-      title: "Back",
+      title: "Dumbbell Exercises",
       exercises: [
-        { name: "Pull-ups", details: "4 sets to failure", defaultSets: 4, defaultReps: 8 },
-        { name: "Bent Over Barbell Row", details: "4 sets of 8-10 reps", defaultSets: 4, defaultReps: 9 },
-        { name: "T-Bar Row", details: "3 sets of 10-12 reps", defaultSets: 3, defaultReps: 11 },
+        { name: "Dumbbell Rows", details: "3 sets of 10-12 reps per arm", defaultSets: 3, defaultReps: 11 },
+        { name: "Dumbbell Bicep Curls", details: "3 sets of 10-12 reps", defaultSets: 3, defaultReps: 11 },
+        { name: "Hammer Curls", details: "3 sets of 10-12 reps", defaultSets: 3, defaultReps: 11 },
+        { name: "Dumbbell Bicep Pause and Curl", details: "3 sets of 8-10 reps", defaultSets: 3, defaultReps: 9 },
       ],
     },
     {
-      title: "Biceps",
+      title: "Barbell Exercises",
       exercises: [
-        { name: "Barbell Curl", details: "3 sets of 8-12 reps", defaultSets: 3, defaultReps: 10 },
-        { name: "Dumbbell Hammer Curl", details: "3 sets of 10-15 reps", defaultSets: 3, defaultReps: 12 },
-        { name: "Concentration Curl", details: "3 sets of 12-15 reps", defaultSets: 3, defaultReps: 14 },
+        { name: "Barbell Rows", details: "4 sets of 6-8 reps", defaultSets: 4, defaultReps: 7 },
+        { name: "Deadlifts", details: "3 sets of 6-8 reps", defaultSets: 3, defaultReps: 7 },
+        { name: "Barbell Curls", details: "3 sets of 8-10 reps", defaultSets: 3, defaultReps: 9 },
+      ],
+    },
+    {
+      title: "Landmine Exercises",
+      exercises: [
+        { name: "Landmine Rows", details: "3 sets of 8-10 reps", defaultSets: 3, defaultReps: 9 },
+        { name: "Landmine T-Bar Rows", details: "3 sets of 8-10 reps", defaultSets: 3, defaultReps: 9 },
+        { name: "One Hand Landmine Row", details: "3 sets of 8-10 reps per arm", defaultSets: 3, defaultReps: 9 },
       ],
     },
   ],
   Legs: [
     {
-      title: "Warm-up",
+      title: "Boxing",
       exercises: [
-        { name: "Bodyweight Squats", details: "3 sets of 20 reps", defaultSets: 3, defaultReps: 20 },
-        { name: "Leg Swings", details: "2 sets of 15 reps per leg", defaultSets: 2, defaultReps: 15 },
+        { name: "Footwork Drills", details: "3 rounds (2 min)", defaultSets: 3, defaultReps: 0 },
+        { name: "Jump Rope", details: "3 rounds (3 min)", defaultSets: 3, defaultReps: 0 },
       ],
     },
     {
-      title: "Quads & Glutes",
+      title: "Dumbbell Exercises",
       exercises: [
-        { name: "Barbell Squat", details: "5 sets of 5 reps", defaultSets: 5, defaultReps: 5 },
-        { name: "Leg Press", details: "4 sets of 10-12 reps", defaultSets: 4, defaultReps: 11 },
-        { name: "Lunges", details: "3 sets of 10-12 reps per leg", defaultSets: 3, defaultReps: 11 },
+        { name: "Dumbbell Goblet Squats", details: "3 sets of 10-12 reps", defaultSets: 3, defaultReps: 11 },
+        { name: "Dumbbell Lunges", details: "3 sets of 10-12 reps per leg", defaultSets: 3, defaultReps: 11 },
+        { name: "Dumbbell Calf Raises", details: "3 sets of 15-20 reps", defaultSets: 3, defaultReps: 18 },
       ],
     },
     {
-      title: "Hamstrings & Calves",
+      title: "Barbell Exercises",
       exercises: [
-        { name: "Romanian Deadlift", details: "4 sets of 8-12 reps", defaultSets: 4, defaultReps: 10 },
-        { name: "Seated Leg Curl", details: "3 sets of 12-15 reps", defaultSets: 3, defaultReps: 14 },
-        { name: "Calf Raises", details: "5 sets of 15-20 reps", defaultSets: 5, defaultReps: 18 },
+        { name: "Barbell Squats", details: "4 sets of 6-8 reps", defaultSets: 4, defaultReps: 7 },
+        { name: "Barbell Romanian Deadlifts", details: "3 sets of 8-10 reps", defaultSets: 3, defaultReps: 9 },
+      ],
+    },
+    {
+      title: "Landmine Exercises",
+      exercises: [
+        { name: "Landmine Squats", details: "3 sets of 10-12 reps", defaultSets: 3, defaultReps: 11 },
+        { name: "Landmine Reverse Lunges", details: "3 sets of 10-12 reps per leg", defaultSets: 3, defaultReps: 11 },
       ],
     },
   ],

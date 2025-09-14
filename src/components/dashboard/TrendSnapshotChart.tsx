@@ -19,11 +19,13 @@ const getProgressionData = (workouts: Workout[] | undefined, exerciseName: strin
 
         let bestSetForWorkout = { weight: 0, reps: 0 };
         relevantExercises.forEach(ex => {
-            ex.sets.forEach(set => {
-                if (set.weight > bestSetForWorkout.weight) {
-                    bestSetForWorkout = { weight: set.weight, reps: set.reps };
-                }
-            })
+            if (Array.isArray(ex.sets)) {
+                ex.sets.forEach(set => {
+                    if (set.weight > bestSetForWorkout.weight) {
+                        bestSetForWorkout = { weight: set.weight, reps: set.reps };
+                    }
+                })
+            }
         });
 
         if (bestSetForWorkout.weight === 0) return null;
@@ -44,7 +46,7 @@ const getUniqueExercises = (workouts: Workout[] | undefined, customExercises: Cu
     const exerciseSet = new Set<string>();
     if (workouts) {
         workouts.forEach(w => w.exercises.forEach(ex => {
-          const hasWeight = ex.sets.some(s => s.weight > 0);
+          const hasWeight = Array.isArray(ex.sets) && ex.sets.some(s => s.weight > 0);
           if (hasWeight) exerciseSet.add(ex.name)
         }));
     }
@@ -115,3 +117,4 @@ export default function TrendSnapshotChart({ workouts, customExercises }: { work
     </Card>
   );
 }
+

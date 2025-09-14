@@ -16,7 +16,7 @@ const SuggestWorkoutInputSchema = z.object({
   fitnessGoals: z.string().describe('The user\'s primary fitness goals.'),
   personalRecords: z.string().describe('A summary of the user\'s personal records for key lifts.'),
   availableExercises: z.array(z.string()).describe('A list of exercises the user has available to them.'),
-  workoutSplit: z.string().describe('The desired workout split for the suggestion (e.g., "Full Body", "Upper/Lower", "Push/Pull/Legs").'),
+  workoutSplit: z.string().describe('The desired workout split for the suggestion (e.g., "Full Body", "Upper Body", "Lower Body", "Push", "Pull", "Legs").'),
 });
 export type SuggestWorkoutInput = z.infer<typeof SuggestWorkoutInputSchema>;
 

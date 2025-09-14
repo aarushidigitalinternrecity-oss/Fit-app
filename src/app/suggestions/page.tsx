@@ -24,7 +24,7 @@ function formatWorkoutHistory(workouts: any[] | undefined): string {
     ).join('; ');
 }
 
-const workoutSplits = ["Full Body", "Upper/Lower", "Push/Pull/Legs"];
+const workoutSplits = ["Full Body", "Upper Body", "Lower Body", "Push", "Pull", "Legs"];
 
 export default function SuggestionsPage() {
     const { data, addWorkout } = useWorkoutData();

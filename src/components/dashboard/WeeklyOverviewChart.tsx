@@ -37,7 +37,9 @@ const getWeekData = (workouts: Workout[] | undefined) => {
             dayData.workouts += 1;
             workout.exercises.forEach(ex => {
                 if (!dayData.volume) dayData.volume = 0;
-                dayData.volume += ex.sets.reduce((acc, set) => acc + (set.reps * set.weight), 0);
+                if (Array.isArray(ex.sets)) {
+                    dayData.volume += ex.sets.reduce((acc, set) => acc + (set.reps * set.weight), 0);
+                }
             });
         }
     });

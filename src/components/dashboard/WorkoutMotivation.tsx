@@ -22,11 +22,27 @@ function formatWorkoutHistory(workouts: Workout[] | undefined): string {
 export default function WorkoutMotivation({ workouts }: { workouts: Workout[] | undefined }) {
   const [motivation, setMotivation] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<boolean>(false);
 
-  const getMotivation = async () => {
+  const getMotivation = async (force = false) => {
+    // Don't refetch if we already have a message, unless forced
+    if (motivation && !force && !error) {
+        setLoading(true); // Briefly set loading for button press feedback
+        setTimeout(() => setLoading(false), 300); // Simulate a quick action
+        // Then get a new tip
+    }
+    
     setLoading(true);
+    setError(false);
+
     try {
       const workoutHistory = formatWorkoutHistory(workouts);
+      if (workoutHistory === "No workouts recorded yet.") {
+          setMotivation("Log a workout to get your first personalized tip!");
+          setLoading(false);
+          return;
+      }
+
       const result = await personalizedWorkoutMotivation({
         workoutHistory,
         fitnessGoals: "Build muscle and increase strength",
@@ -34,20 +50,15 @@ export default function WorkoutMotivation({ workouts }: { workouts: Workout[] | 
       setMotivation(result.motivationMessage);
     } catch (error) {
       console.error("Failed to get motivation:", error);
-      setMotivation("Couldn't get a tip right now. Keep up the great work!");
+      setMotivation("Couldn't get a tip right now, but you're doing great. Keep it up!");
+      setError(true);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Only fetch motivation if there are workouts to analyze
-    if (workouts && workouts.length > 0) {
-      getMotivation();
-    } else {
-        setMotivation("Log a workout to get your first personalized tip!");
-        setLoading(false);
-    }
+    getMotivation();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workouts]);
 
@@ -74,7 +85,7 @@ export default function WorkoutMotivation({ workouts }: { workouts: Workout[] | 
         )}
       </CardContent>
       <CardFooter>
-        <Button onClick={getMotivation} disabled={loading} className="w-full">
+        <Button onClick={() => getMotivation(true)} disabled={loading} className="w-full">
           <Sparkles className="mr-2 h-4 w-4" />
           {loading ? "Generating..." : "Get a New Tip"}
         </Button>

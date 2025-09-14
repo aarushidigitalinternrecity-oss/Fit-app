@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from 'react';
 import { useWorkoutData } from '@/hooks/use-workout-data';
 import AppLayout from '@/components/layout/AppLayout';
 import ManageExercises from '@/components/workout/ManageExercises';
 
 export default function LibraryPage() {
     const { data, addCustomExercise, editCustomExercise, deleteCustomExercise } = useWorkoutData();
-    const [isManageExercisesOpen, setIsManageExercisesOpen] = useState(false);
 
     return (
         <AppLayout>

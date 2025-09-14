@@ -37,7 +37,7 @@ export default function WorkoutLogger({ addWorkout, customExercises, onSheetClos
   const form = useForm<WorkoutFormData>({
     resolver: zodResolver(workoutSchema),
     defaultValues: {
-      exercises: [{ name: '', sets: 1, reps: 1, weight: 0 }],
+      exercises: [{ name: '', sets: 3, reps: 10, weight: 0 }],
     },
   });
 
@@ -66,12 +66,12 @@ export default function WorkoutLogger({ addWorkout, customExercises, onSheetClos
       exercises: data.exercises.map(ex => ({ ...ex, id: crypto.randomUUID() })),
     };
     addWorkout(newWorkout);
-    form.reset({ exercises: [{ name: '', sets: 1, reps: 1, weight: 0 }]});
+    form.reset({ exercises: [{ name: '', sets: 3, reps: 10, weight: 0 }]});
     onSheetClose();
   };
 
   return (
-    <SheetContent className="w-full h-full flex flex-col p-4 sm:p-6">
+    <SheetContent className="w-full h-full flex flex-col p-4 sm:p-6 sm:max-w-lg">
       <SheetHeader>
         <SheetTitle>Log New Workout</SheetTitle>
         <SheetDescription>
@@ -84,9 +84,9 @@ export default function WorkoutLogger({ addWorkout, customExercises, onSheetClos
             <Accordion type="multiple" defaultValue={['item-0']} className="w-full space-y-4">
                 {fields.map((field, index) => (
                 <AccordionItem value={`item-${index}`} key={field.id} className="border-border border rounded-lg bg-card">
-                    <AccordionTrigger className="p-4">
+                    <AccordionTrigger className="p-4 hover:no-underline">
                         <div className="flex justify-between items-center w-full">
-                            <span className="font-semibold truncate">
+                            <span className="font-semibold truncate pr-2">
                                 {form.watch(`exercises.${index}.name`) || `Exercise ${index + 1}`}
                             </span>
                         </div>
@@ -163,7 +163,7 @@ export default function WorkoutLogger({ addWorkout, customExercises, onSheetClos
                             type="button"
                             variant="destructive"
                             size="sm"
-                            className="w-full"
+                            className="w-full mt-2"
                             onClick={() => remove(index)}
                             >
                             <Trash2 className="mr-2 h-4 w-4" />
@@ -181,10 +181,10 @@ export default function WorkoutLogger({ addWorkout, customExercises, onSheetClos
               type="button"
               variant="outline"
               className="w-full"
-              onClick={() => append({ name: '', sets: 1, reps: 1, weight: 0 })}
+              onClick={() => append({ name: '', sets: 3, reps: 10, weight: 0 })}
             >
               <Plus className="mr-2 h-4 w-4" />
-              Add Exercise
+              Add Another Exercise
             </Button>
             <Button type="submit" className="w-full">Save Workout</Button>
           </SheetFooter>

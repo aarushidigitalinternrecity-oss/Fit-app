@@ -1,13 +1,14 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Workout } from "@/lib/types";
-import { subDays, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
+import { startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 import { useEffect, useState } from "react";
 
 const getWorkoutsThisWeek = (workouts: Workout[] | undefined) => {
     if (!workouts) return 0;
     const today = new Date();
-    const weekStart = startOfWeek(today, { weekStartsOn: 1 }); // Monday
+    // Week starts on Monday
+    const weekStart = startOfWeek(today, { weekStartsOn: 1 }); 
     const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
     
     const uniqueDaysThisWeek = new Set(

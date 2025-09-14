@@ -3,40 +3,41 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import type { Workout } from "@/lib/types";
-import { subDays, format, getDay } from 'date-fns';
+import { subDays, getDay } from 'date-fns';
 import { TrendingUp } from "lucide-react";
+import { useMemo } from "react";
 
 const getWeekData = (workouts: Workout[] | undefined) => {
     const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    let data = weekDays.map(day => ({ name: day, workouts: 0, volume: 0, sets: 0, reps: 0 }));
+    let data = weekDays.map(day => ({ name: day, workouts: 0, volume: 0 }));
 
-    if (!workouts) return data;
+    if (!workouts) return { data, totalVolume: 0 };
 
     const today = new Date();
     const oneWeekAgo = subDays(today, 6);
     oneWeekAgo.setHours(0,0,0,0);
 
-
     const thisWeekWorkouts = workouts.filter(w => new Date(w.date) >= oneWeekAgo);
 
     thisWeekWorkouts.forEach(workout => {
         const dayIndex = getDay(new Date(workout.date));
-        data[dayIndex].workouts += 1;
-        workout.exercises.forEach(ex => {
-            data[dayIndex].volume += ex.sets * ex.reps * ex.weight;
-            data[dayIndex].sets += ex.sets;
-            data[dayIndex].reps += ex.reps;
-        });
+        if (data[dayIndex]) {
+            data[dayIndex].workouts += 1;
+            workout.exercises.forEach(ex => {
+                data[dayIndex].volume += ex.sets * ex.reps * (ex.weight || 0);
+            });
+        }
     });
 
+    const totalVolume = data.reduce((acc, day) => acc + day.volume, 0);
     const todayIndex = getDay(today);
-    // Reorder so today is the last day
-    return [...data.slice(todayIndex + 1), ...data.slice(0, todayIndex + 1)];
+    const reorderedData = [...data.slice(todayIndex + 1), ...data.slice(0, todayIndex + 1)];
+    
+    return { data: reorderedData, totalVolume };
 };
 
 export default function WeeklyOverviewChart({ workouts }: { workouts: Workout[] | undefined }) {
-  const data = getWeekData(workouts);
-  const totalVolume = data.reduce((acc, day) => acc + day.volume, 0);
+  const { data, totalVolume } = useMemo(() => getWeekData(workouts), [workouts]);
 
   return (
     <Card>

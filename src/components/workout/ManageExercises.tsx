@@ -22,7 +22,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { ScrollArea } from '../ui/scroll-area';
 
 
 const MUSCLE_GROUPS = ["Chest", "Back", "Legs", "Shoulders", "Arms", "Core", "Other"];
@@ -66,6 +67,7 @@ function ManageExercisesContent({ customExercises, addCustomExercise, editCustom
   const startEditing = (exercise: CustomExercise) => {
     setEditingId(exercise.id);
     form.reset(exercise);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   const cancelEditing = () => {
@@ -75,93 +77,103 @@ function ManageExercisesContent({ customExercises, addCustomExercise, editCustom
 
   return (
     <div className="space-y-6">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(editingId ? onEditSubmit : onAddSubmit)} className="space-y-4 p-4 border rounded-lg bg-card">
-          <h3 className="font-semibold text-lg">{editingId ? 'Edit Exercise' : 'Add New Exercise'}</h3>
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Exercise Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Cable Crossover" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="muscleGroup"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Muscle Group</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a muscle group" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {MUSCLE_GROUPS.map(group => (
-                      <SelectItem key={group} value={group}>{group}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex gap-2 justify-end">
-            {editingId && (
-              <Button type="button" variant="ghost" onClick={cancelEditing}><X className="mr-2"/>Cancel</Button>
-            )}
-            <Button type="submit"><Save className="mr-2"/>{editingId ? 'Save Changes' : 'Save Exercise'}</Button>
-          </div>
-        </form>
-      </Form>
+        <Card>
+            <CardHeader>
+                <CardTitle>{editingId ? 'Edit Exercise' : 'Add New Exercise'}</CardTitle>
+                <CardDescription>{editingId ? "Modify the details below." : "Create a new exercise to add to your library."}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(editingId ? onEditSubmit : onAddSubmit)} className="space-y-4">
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Exercise Name</FormLabel>
+                            <FormControl>
+                            <Input placeholder="e.g., Cable Crossover" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="muscleGroup"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Muscle Group</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                            <FormControl>
+                                <SelectTrigger>
+                                <SelectValue placeholder="Select a muscle group" />
+                                </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                                {MUSCLE_GROUPS.map(group => (
+                                <SelectItem key={group} value={group}>{group}</SelectItem>
+                                ))}
+                            </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <div className="flex gap-2 justify-end pt-2">
+                        {editingId && (
+                        <Button type="button" variant="ghost" onClick={cancelEditing}><X className="mr-2"/>Cancel</Button>
+                        )}
+                        <Button type="submit"><Save className="mr-2"/>{editingId ? 'Save Changes' : 'Save Exercise'}</Button>
+                    </div>
+                    </form>
+                </Form>
+            </CardContent>
+        </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Your Exercises</CardTitle>
+          <CardTitle>Your Custom Exercises</CardTitle>
+          <CardDescription>The exercises you have created.</CardDescription>
         </CardHeader>
         <CardContent>
           {customExercises.length > 0 ? (
-            <ul className='space-y-2'>
-              {customExercises.map(ex => (
-                <li key={ex.id} className='flex items-center justify-between p-3 rounded-lg bg-card-foreground/5'>
-                  <div>
-                    <p className="font-medium">{ex.name}</p>
-                    <p className="text-sm text-muted-foreground">{ex.muscleGroup}</p>
-                  </div>
-                  <div className='flex gap-1'>
-                    <Button variant="ghost" size="icon" onClick={() => startEditing(ex)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="ghost" size="icon" className='text-destructive hover:text-destructive'>
-                          <Trash2 className="h-4 w-4" />
+            <ScrollArea className='h-[400px]'>
+                <ul className='space-y-2 pr-4'>
+                {customExercises.map(ex => (
+                    <li key={ex.id} className='flex items-center justify-between p-3 rounded-lg bg-card-foreground/5'>
+                    <div>
+                        <p className="font-medium">{ex.name}</p>
+                        <p className="text-sm text-muted-foreground">{ex.muscleGroup}</p>
+                    </div>
+                    <div className='flex gap-1'>
+                        <Button variant="ghost" size="icon" onClick={() => startEditing(ex)}>
+                        <Edit className="h-4 w-4" />
                         </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This will permanently delete the exercise "{ex.name}". This action cannot be undone.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => deleteCustomExercise(ex.id)}>Delete</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                        <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon" className='text-destructive hover:text-destructive'>
+                            <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This will permanently delete the exercise "{ex.name}". This action cannot be undone.
+                            </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteCustomExercise(ex.id)}>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                        </AlertDialog>
+                    </div>
+                    </li>
+                ))}
+                </ul>
+            </ScrollArea>
           ) : (
             <p className='text-muted-foreground text-center p-4'>You haven't added any custom exercises yet.</p>
           )}

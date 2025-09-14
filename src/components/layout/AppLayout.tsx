@@ -9,9 +9,10 @@ import { useState } from 'react';
 import { useWorkoutData } from '@/hooks/use-workout-data';
 import BottomNav from './BottomNav';
 import Link from 'next/link';
+import { Skeleton } from '../ui/skeleton';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { data, addWorkout } = useWorkoutData();
+  const { data, addWorkout, loading } = useWorkoutData();
   const [isWorkoutLoggerOpen, setIsWorkoutLoggerOpen] = useState(false);
 
   return (
@@ -44,9 +45,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </header>
 
         <main>
-          {children}
+          {loading ? <AppSkeleton /> : children}
         </main>
       </div>
     </div>
   );
+}
+
+function AppSkeleton() {
+    return (
+        <div className="flex flex-col items-center gap-4 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md">
+                <Skeleton className="h-[200px] w-full" />
+                <Skeleton className="h-[200px] w-full" />
+            </div>
+            <div className="w-full max-w-md space-y-4 md:space-y-6">
+                <Skeleton className="h-[250px] w-full" />
+                <Skeleton className="h-[350px] w-full" />
+                <Skeleton className="h-[250px] w-full" />
+            </div>
+        </div>
+    )
 }

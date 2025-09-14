@@ -17,19 +17,20 @@ const calculateStreak = (workouts: Workout[] | undefined): number => {
     
     const diffFromToday = differenceInCalendarDays(today, uniqueDays[0]);
 
+    // If latest workout is not today or yesterday, streak is 0
     if (diffFromToday > 1) {
-        return 0; // Streak is broken
+        return 0;
     }
     
-    if (diffFromToday === 0 || diffFromToday === 1) {
-        streak = 1;
-        for (let i = 1; i < uniqueDays.length; i++) {
-            const diff = differenceInCalendarDays(uniqueDays[i-1], uniqueDays[i]);
-            if (diff === 1) {
-                streak++;
-            } else {
-                break; // Gap in days, streak ends
-            }
+    // Streak starts at 1 if workout was today or yesterday
+    streak = 1;
+    for (let i = 1; i < uniqueDays.length; i++) {
+        const diff = differenceInCalendarDays(uniqueDays[i-1], uniqueDays[i]);
+        if (diff === 1) {
+            streak++;
+        } else {
+            // Gap in days, so streak ends
+            break; 
         }
     }
     

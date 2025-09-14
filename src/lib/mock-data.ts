@@ -1,7 +1,7 @@
 import type { AppData } from '@/lib/types';
 import { subDays, addMonths } from 'date-fns';
 
-const generateId = () => Math.random().toString(36).substr(2, 9);
+const generateId = () => crypto.randomUUID();
 
 export const PRELOADED_EXERCISES = [
   'Bench Press',
@@ -30,7 +30,7 @@ export const MOCK_DATA: AppData = {
     },
     {
       id: generateId(),
-      date: subDays(new Date(), 2).toISOString(),
+      date: subDays(new Date(), 3).toISOString(),
       exercises: [
         { id: generateId(), name: 'Squat', sets: 5, reps: 5, weight: 120 },
         { id: generateId(), name: 'Leg Press', sets: 3, reps: 10, weight: 200 },
@@ -39,16 +39,16 @@ export const MOCK_DATA: AppData = {
     },
     {
       id: generateId(),
-      date: subDays(new Date(), 4).toISOString(),
+      date: subDays(new Date(), 5).toISOString(),
       exercises: [
         { id: generateId(), name: 'Deadlift', sets: 3, reps: 5, weight: 150 },
-        { id: generateId(), name: 'Pull Ups', sets: 4, reps: 8, weight: 0 },
+        { id: generateId(), name: 'Pull Ups', sets: 4, reps: 8, weight: 0 }, // Bodyweight
         { id: generateId(), name: 'Barbell Row', sets: 3, reps: 8, weight: 70 },
       ],
     },
     {
       id: generateId(),
-      date: subDays(new Date(), 6).toISOString(),
+      date: subDays(new Date(), 7).toISOString(),
       exercises: [
         { id: generateId(), name: 'Bench Press', sets: 4, reps: 8, weight: 95 },
         { id: generateId(), name: 'Overhead Press', sets: 4, reps: 8, weight: 50 },
@@ -57,9 +57,16 @@ export const MOCK_DATA: AppData = {
     },
      {
       id: generateId(),
-      date: subDays(new Date(), 8).toISOString(),
+      date: subDays(new Date(), 10).toISOString(),
       exercises: [
         { id: generateId(), name: 'Squat', sets: 5, reps: 5, weight: 115 },
+      ],
+    },
+    {
+      id: generateId(),
+      date: subDays(new Date(), 12).toISOString(),
+      exercises: [
+        { id: generateId(), name: 'Bench Press', sets: 4, reps: 10, weight: 90 },
       ],
     },
   ],

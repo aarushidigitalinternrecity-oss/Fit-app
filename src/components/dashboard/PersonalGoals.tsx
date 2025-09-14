@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Target, Plus, Edit, Trash2, CheckCircle2, CalendarIcon, X } from "lucide-react";
+import { Target, Plus, Edit, Trash2, CheckCircle2, CalendarIcon } from "lucide-react";
 import type { PersonalGoal, Workout, CustomExercise } from "@/lib/types";
 import { calculatePersonalRecords } from '@/hooks/use-workout-data';
 import { format, formatDistanceToNow } from 'date-fns';

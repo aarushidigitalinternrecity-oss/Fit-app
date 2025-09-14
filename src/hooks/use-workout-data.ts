@@ -17,6 +17,7 @@ export function useWorkoutData() {
       const storedData = localStorage.getItem(DATA_KEY);
       if (storedData) {
         const parsedData = JSON.parse(storedData);
+        // Ensure arrays exist to prevent errors on older data structures
         if (!Array.isArray(parsedData.customExercises)) {
             parsedData.customExercises = [];
         }
@@ -30,7 +31,7 @@ export function useWorkoutData() {
       }
     } catch (error) {
       console.error("Failed to load data from localStorage", error);
-      setData(MOCK_DATA);
+      setData(MOCK_DATA); // Fallback to mock data on error
     } finally {
       setLoading(false);
     }
@@ -42,14 +43,20 @@ export function useWorkoutData() {
       setData(newData);
     } catch (error) {
       console.error("Failed to save data to localStorage", error);
+      toast({
+        variant: 'destructive',
+        title: "Oh no! Something went wrong.",
+        description: "Your data could not be saved. Please try again.",
+      });
     }
-  }, []);
+  }, [toast]);
   
   const addWorkout = useCallback((newWorkout: Omit<Workout, 'id'>) => {
     if (!data) return;
 
-    const workoutWithId = { ...newWorkout, id: Date.now().toString() };
+    const workoutWithId = { ...newWorkout, id: crypto.randomUUID() };
     
+    // Check for new Personal Records
     const currentPRs = calculatePersonalRecords(data.workouts);
     workoutWithId.exercises.forEach(exercise => {
       const existingPR = currentPRs.find(pr => pr.exerciseName === exercise.name);
@@ -66,6 +73,7 @@ export function useWorkoutData() {
       workouts: [workoutWithId, ...data.workouts],
     };
     saveData(newData);
+    toast({ title: "✅ Workout Saved!", description: "Your session has been logged." });
   }, [data, saveData, toast]);
 
   const addCustomExercise = useCallback((exercise: Omit<CustomExercise, 'id'>) => {
@@ -96,7 +104,7 @@ export function useWorkoutData() {
     const updatedExercises = (data.customExercises || []).filter(ex => ex.id !== exerciseId);
     const newData: AppData = { ...data, customExercises: updatedExercises };
     saveData(newData);
-    toast({ title: "🗑️ Exercise deleted", description: `"${exerciseToDelete.name}" has been removed.` });
+    toast({ title: "🗑️ Exercise deleted", description: `"${exerciseToDelete.name}" has been removed.`, variant: 'destructive' });
   }, [data, saveData, toast]);
 
   const addPersonalGoal = useCallback((goal: Omit<PersonalGoal, 'id'>) => {
@@ -127,42 +135,55 @@ export function useWorkoutData() {
     const updatedGoals = (data.personalGoals || []).filter(g => g.id !== goalId);
     const newData: AppData = { ...data, personalGoals: updatedGoals };
     saveData(newData);
-    toast({ title: "🗑️ Goal Removed", description: `The goal for ${goalToDelete.exerciseName} has been removed.` });
+    toast({ title: "🗑️ Goal Removed", description: `The goal for ${goalToDelete.exerciseName} has been removed.`, variant: 'destructive' });
   }, [data, saveData, toast]);
 
   return { data, loading, addWorkout, addCustomExercise, editCustomExercise, deleteCustomExercise, addPersonalGoal, editPersonalGoal, deletePersonalGoal };
 }
 
-export const calculatePersonalRecords = (workouts: Workout[]): PersonalRecord[] => {
+/**
+ * Calculates personal records from a list of workouts.
+ * For each exercise, it finds the session with the highest weight.
+ * @param workouts Array of workout objects.
+ * @returns An array of personal record objects.
+ */
+export const calculatePersonalRecords = (workouts: Workout[] | undefined): PersonalRecord[] => {
     const prs: { [key: string]: PersonalRecord } = {};
     
     if (!workouts) return [];
 
-    const sortedWorkouts = [...workouts].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // Flatten all exercises from all workouts into a single array with dates
+    const allExercises = workouts.flatMap(workout => 
+        workout.exercises.map(exercise => ({...exercise, date: workout.date}))
+    );
 
-    sortedWorkouts.forEach(workout => {
-        workout.exercises.forEach(exercise => {
-            // Simple PR logic: highest weight for a given number of reps.
-            // A more complex logic could calculate 1-rep max.
-            const prKey = `${exercise.name}-${exercise.reps}`;
-            if (!prs[prKey] || exercise.weight >= prs[prKey].weight) {
-                prs[prKey] = {
-                    exerciseName: exercise.name,
-                    weight: exercise.weight,
-                    reps: exercise.reps,
-                    date: workout.date,
-                };
-            }
-        });
-    });
-
-    // To simplify, we'll return the PR with the highest weight for each exercise
-    const finalPrs: { [key: string]: PersonalRecord } = {};
-    Object.values(prs).forEach(pr => {
-        if (!finalPrs[pr.exerciseName] || pr.weight > finalPrs[pr.exerciseName].weight) {
-            finalPrs[pr.exerciseName] = pr;
+    // Group exercises by name
+    const exercisesByName: { [key: string]: typeof allExercises } = allExercises.reduce((acc, ex) => {
+        if (!acc[ex.name]) {
+            acc[ex.name] = [];
         }
-    });
+        acc[ex.name].push(ex);
+        return acc;
+    }, {} as { [key: string]: typeof allExercises });
 
-    return Object.values(finalPrs).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    // Find the PR for each exercise group
+    for (const exerciseName in exercisesByName) {
+        const sortedExercises = exercisesByName[exerciseName].sort((a, b) => {
+            // Prioritize higher weight, then higher reps, then more recent date
+            if (b.weight !== a.weight) return b.weight - a.weight;
+            if (b.reps !== a.reps) return b.reps - a.reps;
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+
+        const bestPerformance = sortedExercises[0];
+        
+        prs[exerciseName] = {
+            exerciseName: bestPerformance.name,
+            weight: bestPerformance.weight,
+            reps: bestPerformance.reps,
+            date: bestPerformance.date,
+        };
+    }
+
+    return Object.values(prs).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };

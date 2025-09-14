@@ -27,9 +27,8 @@ const getUniqueExercises = (workouts: Workout[] | undefined, customExercises: Cu
     if (workouts) {
         workouts.forEach(w => w.exercises.forEach(ex => ex.weight > 0 && exerciseSet.add(ex.name)));
     }
-    if (customExercises) {
-        customExercises.forEach(ex => exerciseSet.add(ex.name));
-    }
+    // No need to add custom exercises separately if we get them from workouts.
+    // If a custom exercise has never been performed, it won't have progression data anyway.
     return Array.from(exerciseSet).sort();
 };
 

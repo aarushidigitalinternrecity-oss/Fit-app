@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { BarChart3, Repeat, Weight, Dumbbell } from "lucide-react";
 import type { Workout } from "@/lib/types";
+import { useMemo } from "react";
 
 interface StatProps {
     icon: React.ReactNode;
@@ -26,8 +27,9 @@ const getStats = (workouts: Workout[] | undefined) => {
     }
     
     const totalWorkouts = workouts.length;
+    
     const totalVolume = workouts.reduce((total, w) => 
-        total + w.exercises.reduce((sub, ex) => sub + (ex.sets * ex.reps * ex.weight), 0), 0);
+        total + w.exercises.reduce((sub, ex) => sub + (ex.sets * ex.reps * (ex.weight || 0)), 0), 0);
     
     const exerciseCounts = workouts.flatMap(w => w.exercises).reduce((acc, ex) => {
         acc[ex.name] = (acc[ex.name] || 0) + 1;
@@ -40,7 +42,7 @@ const getStats = (workouts: Workout[] | undefined) => {
 };
 
 export default function QuickStats({ workouts }: { workouts: Workout[] | undefined }) {
-    const { totalWorkouts, totalVolume, mostTrained } = getStats(workouts);
+    const { totalWorkouts, totalVolume, mostTrained } = useMemo(() => getStats(workouts), [workouts]);
 
     return (
         <Card>

@@ -26,11 +26,6 @@ const WeeklyOverviewChart = dynamic(() => import('@/components/dashboard/WeeklyO
     loading: () => <Skeleton className="h-[350px] w-full" />,
     ssr: false
 });
-const WorkoutMotivation = dynamic(() => import('@/components/dashboard/WorkoutMotivation'), {
-    loading: () => <Skeleton className="h-[250px] w-full" />,
-    ssr: false
-});
-
 
 export default function DashboardPage() {
   const { data, addPersonalGoal, editPersonalGoal, deletePersonalGoal } = useWorkoutData();
@@ -43,7 +38,6 @@ export default function DashboardPage() {
             <ProgressRings workouts={data?.workouts} weeklyGoal={data?.user.goals.weeklyWorkoutTarget} />
         </div>
         <div className="w-full max-w-md space-y-4 md:space-y-6">
-            <WorkoutMotivation workouts={data?.workouts} />
             <TodaySummary workouts={data?.workouts} />
             <WeeklyOverviewChart workouts={data?.workouts} />
             <PersonalGoals 
@@ -59,4 +53,3 @@ export default function DashboardPage() {
     </AppLayout>
   );
 }
-

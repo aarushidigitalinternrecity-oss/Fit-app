@@ -23,10 +23,13 @@ const getProgressionData = (workouts: Workout[] | undefined, exerciseName: strin
 };
 
 const getUniqueExercises = (workouts: Workout[] | undefined, customExercises: CustomExercise[] | undefined) => {
-    if (!workouts) return [];
     const exerciseSet = new Set<string>();
-    workouts.forEach(w => w.exercises.forEach(ex => ex.weight > 0 && exerciseSet.add(ex.name)));
-    customExercises?.forEach(ex => exerciseSet.add(ex.name));
+    if (workouts) {
+        workouts.forEach(w => w.exercises.forEach(ex => ex.weight > 0 && exerciseSet.add(ex.name)));
+    }
+    if (customExercises) {
+        customExercises.forEach(ex => exerciseSet.add(ex.name));
+    }
     return Array.from(exerciseSet).sort();
 };
 
@@ -35,8 +38,10 @@ export default function TrendSnapshotChart({ workouts, customExercises }: { work
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!selectedExercise && uniqueExercises.length > 0) {
+    if (uniqueExercises.length > 0 && (!selectedExercise || !uniqueExercises.includes(selectedExercise))) {
       setSelectedExercise(uniqueExercises[0]);
+    } else if (uniqueExercises.length === 0) {
+        setSelectedExercise(null);
     }
   }, [uniqueExercises, selectedExercise]);
 
@@ -53,7 +58,7 @@ export default function TrendSnapshotChart({ workouts, customExercises }: { work
                 </CardTitle>
                 <CardDescription>Progression for a key lift.</CardDescription>
             </div>
-            <Select onValueChange={setSelectedExercise} value={selectedExercise || ''} >
+            <Select onValueChange={setSelectedExercise} value={selectedExercise || ''} disabled={uniqueExercises.length === 0} >
                 <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select exercise" />
                 </SelectTrigger>
@@ -83,7 +88,7 @@ export default function TrendSnapshotChart({ workouts, customExercises }: { work
           </ResponsiveContainer>
         ) : (
             <div className='flex items-center justify-center h-full text-muted-foreground text-center'>
-                <p>{!selectedExercise ? "Select an exercise to see your trend." : "Not enough data to show a trend for this exercise."}</p>
+                <p>{uniqueExercises.length === 0 ? "Log a workout to see trends." : !selectedExercise ? "Select an exercise to see your trend." : "Not enough data to show a trend for this exercise."}</p>
             </div>
         )}
       </CardContent>

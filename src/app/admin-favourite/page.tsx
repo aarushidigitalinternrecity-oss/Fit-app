@@ -110,8 +110,9 @@ export default function AdminFavouritePage() {
             })
         });
 
-        return totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
-    }, [watch]);
+        if (totalCount === 0) return 0;
+        return (completedCount / totalCount) * 100;
+    }, [watch('exercises')]);
 
 
     return (

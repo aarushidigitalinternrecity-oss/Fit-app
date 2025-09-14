@@ -16,6 +16,7 @@ import { useMemo, useEffect } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { Separator } from '../ui/separator';
 import { Checkbox } from '../ui/checkbox';
+import { Label } from '../ui/label';
 
 const exerciseSetSchema = z.object({
   id: z.string(),

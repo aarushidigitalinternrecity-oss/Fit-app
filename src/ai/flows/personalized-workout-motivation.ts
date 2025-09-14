@@ -57,6 +57,7 @@ const personalizedWorkoutMotivationFlow = ai.defineFlow(
     name: 'personalizedWorkoutMotivationFlow',
     inputSchema: PersonalizedWorkoutMotivationInputSchema,
     outputSchema: PersonalizedWorkoutMotivationOutputSchema,
+    retries: 3,
   },
   async input => {
     const {output} = await prompt(input);

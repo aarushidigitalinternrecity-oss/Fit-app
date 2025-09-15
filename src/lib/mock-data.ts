@@ -5,17 +5,55 @@ import { subDays, addMonths } from 'date-fns';
 const generateId = () => crypto.randomUUID();
 
 export const PRELOADED_EXERCISES = [
-  'Bench Press',
+  // Chest
+  'Barbell Bench Press',
+  'Incline Barbell Press',
+  'Decline Barbell Press',
+  'Dumbbell Bench Press',
   'Incline Dumbbell Press',
-  'Tricep Pushdown',
-  'Squat',
-  'Leg Press',
-  'Leg Curl',
+  'Decline Dumbbell Press',
+  'Weighted Dips',
+  'Dumbbell Flys',
+  'Cable Crossover',
+  'Push-ups',
+
+  // Back
   'Deadlift',
-  'Pull Ups',
-  'Barbell Row',
+  'Pull-ups',
+  'Chin-ups',
+  'Bent-Over Rows',
+  'Seated Cable Rows',
+  'Lat Pulldowns',
+  'T-Bar Rows',
+  'Face Pulls',
+
+  // Shoulders
   'Overhead Press',
   'Lateral Raises',
+  'Front Raises',
+  'Arnold Press',
+  'Upright Rows',
+
+  // Legs
+  'Barbell Back Squat',
+  'Leg Press',
+  'Bulgarian Split Squats',
+  'Romanian Deadlifts',
+  'Walking Lunges',
+  'Leg Extensions',
+  'Leg Curls',
+  'Glute Bridges',
+  'Calf Raises',
+
+  // Arms
+  'Barbell Curls',
+  'Hammer Curls',
+  'Incline Dumbbell Curls',
+  'Concentration Curls',
+  'Triceps Pushdowns',
+  'Close-Grip Bench Press',
+  'Overhead Triceps Extensions',
+  'Dips',
 ];
 
 export const MOCK_DATA: AppData = {
